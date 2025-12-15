@@ -3,338 +3,1368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud Cost Analytics Dashboard</title>
+    <title>Hyperglance Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Mantine Core CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/@mantine/core@7.4.0/styles.css">
+    <!-- Mantine CSS Variables -->
     <style>
+        :root {
+            /* Mantine CSS Variables - From Hyperglance Theme */
+            --mantine-scale: 1;
+            --mantine-cursor-type: pointer;
+            --mantine-webkit-font-smoothing: antialiased;
+            --mantine-moz-font-smoothing: grayscale;
+            --mantine-color-scheme: light;
+            --mantine-font-family: Poppins, sans-serif;
+            --mantine-font-family-headings: Poppins, sans-serif;
+            --mantine-font-family-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+            --mantine-heading-font-weight: 700;
+            --mantine-line-height: 1.55;
+            
+            /* Mantine Radius */
+            --mantine-radius-default: calc(0.5rem * var(--mantine-scale));
+            --mantine-radius-xs: calc(0.125rem * var(--mantine-scale));
+            --mantine-radius-sm: calc(0.25rem * var(--mantine-scale));
+            --mantine-radius-md: calc(0.5rem * var(--mantine-scale));
+            --mantine-radius-lg: calc(1rem * var(--mantine-scale));
+            --mantine-radius-xl: calc(2rem * var(--mantine-scale));
+            
+            /* Mantine Spacing */
+            --mantine-spacing-xs: calc(0.625rem * var(--mantine-scale));
+            --mantine-spacing-sm: calc(0.75rem * var(--mantine-scale));
+            --mantine-spacing-md: calc(1rem * var(--mantine-scale));
+            --mantine-spacing-lg: calc(1.25rem * var(--mantine-scale));
+            --mantine-spacing-xl: calc(2rem * var(--mantine-scale));
+            
+            /* Mantine Font Sizes - Adjusted as per document */
+            --mantine-font-size-xs: calc(calc(0.75rem - 2px) * var(--mantine-scale));
+            --mantine-font-size-sm: calc(calc(0.875rem - 2px) * var(--mantine-scale));
+            --mantine-font-size-md: calc(calc(1rem - 2px) * var(--mantine-scale));
+            --mantine-font-size-lg: calc(calc(1.125rem - 2px) * var(--mantine-scale));
+            --mantine-font-size-xl: calc(calc(1.25rem - 2px) * var(--mantine-scale));
+            
+            /* Mantine Shadows */
+            --mantine-shadow-xs: 0 calc(0.0625rem * var(--mantine-scale)) calc(0.1875rem * var(--mantine-scale)) rgba(0, 0, 0, 0.05), 0 calc(0.0625rem * var(--mantine-scale)) calc(0.125rem * var(--mantine-scale)) rgba(0, 0, 0, 0.1);
+            --mantine-shadow-sm: 0 calc(0.0625rem * var(--mantine-scale)) calc(0.1875rem * var(--mantine-scale)) rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 calc(0.625rem * var(--mantine-scale)) calc(0.9375rem * var(--mantine-scale)) calc(-0.3125rem * var(--mantine-scale)), rgba(0, 0, 0, 0.04) 0 calc(0.4375rem * var(--mantine-scale)) calc(0.4375rem * var(--mantine-scale)) calc(-0.3125rem * var(--mantine-scale));
+            --mantine-shadow-md: 0 calc(0.0625rem * var(--mantine-scale)) calc(0.1875rem * var(--mantine-scale)) rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 calc(1.25rem * var(--mantine-scale)) calc(1.5625rem * var(--mantine-scale)) calc(-0.3125rem * var(--mantine-scale)), rgba(0, 0, 0, 0.04) 0 calc(0.625rem * var(--mantine-scale)) calc(0.625rem * var(--mantine-scale)) calc(-0.3125rem * var(--mantine-scale));
+            
+            /* Mantine Z-Index */
+            --mantine-z-index-app: 100;
+            --mantine-z-index-modal: 200;
+            --mantine-z-index-popover: 300;
+            --mantine-z-index-overlay: 400;
+            --mantine-z-index-max: 9999;
+            
+            /* Mantine Gray Scale */
+            --mantine-color-white: #FFFFFF;
+            --mantine-color-black: #000000;
+            --mantine-color-gray-0: #f8f9fa;
+            --mantine-color-gray-1: #f1f3f5;
+            --mantine-color-gray-2: #e9ecef;
+            --mantine-color-gray-3: #dee2e6;
+            --mantine-color-gray-4: #ced4da;
+            --mantine-color-gray-5: #adb5bd;
+            --mantine-color-gray-6: #868e96;
+            --mantine-color-gray-7: #495057;
+            --mantine-color-gray-8: #343a40;
+            --mantine-color-gray-9: #212529;
+            
+            /* Mantine Semantic Colors */
+            --mantine-color-body: #FFFFFF;
+            --mantine-color-text: #000000;
+            --mantine-color-placeholder: var(--mantine-color-gray-5);
+            --mantine-color-default: var(--mantine-color-white);
+            --mantine-color-default-hover: var(--mantine-color-gray-0);
+            --mantine-color-default-color: var(--mantine-color-black);
+            --mantine-color-default-border: var(--mantine-color-gray-4);
+            --mantine-color-dimmed: var(--mantine-color-gray-6);
+            --mantine-color-error: var(--mantine-color-red-6);
+            
+            /* Hyperglance Custom Colors */
+            --hg-blue: #0100ca;
+            --hg-sky-blue: #0295ff;
+            --hg-cta-blue: #003fe1;
+            --hg-pale-sky-blue: hsl(from var(--hg-cta-blue) h s 75%);
+            --hg-dark-blue: #000384;
+            --hg-very-dark-blue: #01004e;
+            --hg-light-blue: #65c0ff;
+            --hg-very-light-blue: #cbeaff;
+            --hg-ultra-light-blue: #ebf7ff;
+            --hg-black: #000000;
+            --hg-white: #ffffff;
+            --hg-gray: #3c3c3b;
+            --hg-dark-gray: #333333;
+            --hg-medium-gray: #666666;
+            --hg-medium-light-gray: #939393;
+            --hg-light-grey: #dddddb;
+            --hg-bluish-gray: #8f99a826;
+            --hg-very-light-gray: #efefef;
+            --hg-red: #c20114;
+            --hg-light-red: #f16c6c;
+            --hg-teal: #0dbdba;
+            --hg-green: #69ba6b;
+            --hg-lilac: #976bfc;
+            --hg-pink: #d94c6f;
+            --hg-orange: #f69827;
+            --hg-yellow: #f7df57;
+            --hg-slate-gray: #5f6b7c;
+            --hg-success: #4da10f;
+            --hg-warning: #d9822b;
+            --hg-danger: #be1348;
+            --hg-caution: #f3d55b;
+            --base-background-color: #fafafa;
+            --base-background-color-text: var(--mantine-color-dark-9);
+            
+            /* Mantine Primary Color Scale (Blue Theme) */
+            --mantine-color-primary-0: #eaeaff;
+            --mantine-color-primary-1: #d0d0ff;
+            --mantine-color-primary-2: #9d9cfd;
+            --mantine-color-primary-3: #6765fc;
+            --mantine-color-primary-4: #3c37fb;
+            --mantine-color-primary-5: #231bfb;
+            --mantine-color-primary-6: #160dfc;
+            --mantine-color-primary-7: #0a02e1;
+            --mantine-color-primary-8: #0100ca;
+            --mantine-color-primary-9: #0000b1;
+            --mantine-primary-color-filled: var(--mantine-color-primary-5);
+            --mantine-primary-color-filled-hover: var(--mantine-color-primary-6);
+            --mantine-primary-color-light: rgba(35, 27, 251, 0.1);
+            --mantine-primary-color-light-hover: rgba(35, 27, 251, 0.12);
+            --mantine-primary-color-light-color: var(--mantine-color-primary-5);
+            --mantine-primary-color-contrast: var(--mantine-color-white);
+            
+            /* Mantine CTA Blue */
+            --mantine-color-ctaBlue-7: #003fe1;
+            
+            /* Button box shadow from BlueprintJS */
+            --bp-button-box-shadow: inset 0 0 0 1px rgba(17, 20, 24, 0.2), 0 1px 2px rgba(17, 20, 24, 0.1);
+            
+            /* App Shell Variables */
+            --app-shell-navbar-width: 15.625rem;
+            --app-shell-navbar-offset: 15.625rem;
+            --app-shell-header-height: 3.125rem;
+            --app-shell-header-offset: 3.125rem;
+            --app-shell-padding: 0px;
+            --app-shell-border-color: var(--mantine-color-gray-3);
+            --app-shell-transition-duration: 200ms;
+            --app-shell-transition-timing-function: ease;
+            --app-shell-header-z-index: 100;
+            
+            /* Content Layout Variables */
+            --content-nav-width: 15.625rem;
+            --content-width: calc(100vw - 15.625rem);
+            
+            /* Layout Variables */
+            --header-height: 3.125rem;
+            --utility-bar-height: 3.125rem;
+            --main-tabs-height: 3.125rem;
+            --global-padding: calc(1.25rem * var(--mantine-scale));
+            --popover-radius: var(--mantine-radius-lg);
+            
+            /* Paper/Card Variables */
+            --paper-radius: var(--mantine-radius-default);
+            --paper-border-color: var(--mantine-color-gray-3);
+            --paper-shadow: var(--mantine-shadow-sm);
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', 'Roboto', -apple-system, sans-serif; background: #f5f7fa; font-size: 13px; }
+        body { 
+            font-family: var(--mantine-font-family); 
+            background: var(--base-background-color); 
+            font-size: var(--mantine-font-size-sm);
+            color: var(--mantine-color-black);
+            -webkit-font-smoothing: var(--mantine-webkit-font-smoothing);
+            line-height: var(--mantine-line-height);
+        }
         
-        .container { display: flex; min-height: 100vh; }
+        .app { display: flex; min-height: 100vh; }
         
-        /* Sidebar */
-        .sidebar { width: 200px; background: #1e2a3b; color: #fff; display: flex; flex-direction: column; }
-        .logo { padding: 16px 20px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .logo-text { font-size: 18px; font-weight: 600; background: linear-gradient(90deg, #6366f1, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .filter-section { padding: 16px 20px; }
-        .filter-label { display: flex; align-items: center; gap: 8px; color: #94a3b8; margin-bottom: 8px; font-size: 12px; }
-        .filter-dropdown { background: #fff; color: #1e2a3b; padding: 8px 12px; border-radius: 4px; font-size: 13px; }
-        .nav-section { flex: 1; padding: 0 12px; }
-        .nav-title { color: #6366f1; font-size: 11px; font-weight: 600; padding: 8px; letter-spacing: 0.5px; }
-        .nav-item { padding: 8px 8px 8px 16px; color: #94a3b8; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-        .nav-item:hover { color: #fff; }
-        .nav-item.active { color: #fbbf24; }
-        .nav-group-title { display: flex; align-items: center; gap: 8px; padding: 8px; color: #fff; cursor: pointer; font-weight: 500; }
-        .warning-box { padding: 12px 16px; background: rgba(251, 191, 36, 0.1); margin: 8px 12px; border-radius: 4px; display: flex; align-items: flex-start; gap: 8px; }
-        .warning-box span { color: #fbbf24; font-size: 11px; line-height: 1.4; }
-        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-footer-item { color: #94a3b8; padding: 8px 0; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-        .version { color: #64748b; font-size: 11px; margin-top: 8px; }
+        /* Mantine-style Paper component */
+        .mantine-Paper-root {
+            background-color: var(--mantine-color-white);
+            border-radius: var(--mantine-radius-md);
+            box-shadow: var(--mantine-shadow-xs);
+        }
         
-        /* Main Content */
-        .main { flex: 1; display: flex; flex-direction: column; }
+        /* Mantine-style Card */
+        .mantine-Card-root {
+            background-color: var(--mantine-color-white);
+            border-radius: var(--mantine-radius-md);
+            box-shadow: var(--mantine-shadow-xs);
+            border: 1px solid var(--mantine-color-gray-2);
+            overflow: hidden;
+        }
         
-        /* Headers */
-        .top-header { background: #fff; padding: 12px 24px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0; gap: 24px; }
-        .top-header-title { font-weight: 600; color: #1e2a3b; }
-        .share-link { display: flex; align-items: center; gap: 8px; color: #6366f1; cursor: pointer; font-size: 13px; }
-        .search-box { background: #f1f5f9; padding: 8px 16px; border-radius: 4px; color: #64748b; display: flex; align-items: center; gap: 8px; min-width: 250px; }
-        .update-badge { background: #fef2f2; color: #dc2626; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; font-weight: 500; }
-        .header-icons { display: flex; gap: 16px; color: #64748b; }
+        /* Mantine-style Badge */
+        .mantine-Badge-root {
+            font-family: var(--mantine-font-family);
+            font-size: var(--mantine-font-size-xs);
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: var(--mantine-radius-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .mantine-Badge-root.error {
+            background-color: transparent;
+            border: 1px solid var(--hg-red);
+            color: var(--hg-red);
+        }
+        .mantine-Badge-root.gray {
+            background-color: var(--mantine-color-gray-6);
+            color: var(--mantine-color-white);
+        }
         
-        .sub-header { background: #fff; padding: 12px 24px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        .tab-active { background: #3b82f6; color: #fff; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
-        .tab-inactive { background: #f1f5f9; color: #64748b; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; margin-left: 4px; }
-        .header-btn { background: #3b82f6; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-        .header-btn-secondary { background: #fff; color: #64748b; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-left: 8px; }
+        /* Mantine-style Text Input */
+        .mantine-TextInput-root {
+            position: relative;
+        }
+        .mantine-TextInput-input {
+            font-family: var(--mantine-font-family);
+            background-color: var(--mantine-color-white);
+            border: 1px solid var(--mantine-color-gray-3);
+            border-radius: var(--mantine-radius-md);
+            padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+            font-size: var(--mantine-font-size-sm);
+            color: var(--mantine-color-gray-5);
+            display: flex;
+            align-items: center;
+            gap: var(--mantine-spacing-xs);
+        }
+        
+        /* Mantine-style Tabs - Exact Hyperglance specs */
+        .mantine-Tabs-root {
+            display: flex;
+        }
+        .mantine-Tabs-list {
+            display: flex;
+            gap: 0;
+            padding-left: var(--mantine-spacing-md);
+        }
+        .mantine-Tabs-tab {
+            font-family: var(--mantine-font-family);
+            font-size: var(--mantine-font-size-sm);
+            font-weight: 500;
+            padding: var(--mantine-spacing-md) var(--mantine-spacing-lg);
+            border: none;
+            background: transparent;
+            color: var(--mantine-color-gray-6);
+            cursor: var(--mantine-cursor-type);
+            display: flex;
+            align-items: center;
+            gap: var(--mantine-spacing-xs);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -1px;
+            transition: color var(--app-shell-transition-duration) var(--app-shell-transition-timing-function), 
+                        border-color var(--app-shell-transition-duration) var(--app-shell-transition-timing-function),
+                        background-color var(--app-shell-transition-duration) var(--app-shell-transition-timing-function);
+        }
+        .mantine-Tabs-tab:hover {
+            color: var(--hg-dark-gray);
+            background-color: var(--mantine-color-gray-0);
+        }
+        .mantine-Tabs-tab[data-active="true"] {
+            color: var(--hg-cta-blue);
+            border-bottom-color: var(--hg-cta-blue);
+            font-weight: 600;
+        }
+        .mantine-Tabs-tab svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Mantine-style SegmentedControl */
+        .mantine-SegmentedControl-root {
+            background-color: var(--mantine-color-gray-1);
+            border-radius: var(--mantine-radius-sm);
+            padding: 3px;
+            display: inline-flex;
+            border: 1px solid var(--mantine-color-gray-2);
+        }
+        .mantine-SegmentedControl-control {
+            font-family: var(--mantine-font-family);
+            font-size: var(--mantine-font-size-xs);
+            padding: 6px 14px;
+            border: none;
+            background: transparent;
+            color: var(--mantine-color-gray-6);
+            cursor: var(--mantine-cursor-type);
+            border-radius: var(--mantine-radius-xs);
+            transition: background-color 150ms ease, color 150ms ease;
+        }
+        .mantine-SegmentedControl-control:hover {
+            color: var(--hg-dark-gray);
+        }
+        .mantine-SegmentedControl-control[data-active="true"] {
+            background-color: var(--hg-dark-gray);
+            color: var(--mantine-color-white);
+        }
+        
+        /* Mantine-style Switch Toggle */
+        .mantine-Switch-root {
+            display: inline-flex;
+            align-items: center;
+            gap: calc(0.5rem * var(--mantine-scale));
+            cursor: var(--mantine-cursor-type);
+        }
+        .mantine-Switch-root input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .mantine-Switch-track {
+            position: relative;
+            width: calc(2.5rem * var(--mantine-scale));
+            height: calc(1.25rem * var(--mantine-scale));
+            background-color: var(--mantine-color-gray-3);
+            border-radius: calc(1rem * var(--mantine-scale));
+            transition: background-color var(--app-shell-transition-duration) var(--app-shell-transition-timing-function);
+        }
+        .mantine-Switch-root input:checked + .mantine-Switch-track {
+            background-color: var(--hg-cta-blue);
+        }
+        .mantine-Switch-thumb {
+            position: absolute;
+            top: calc(0.125rem * var(--mantine-scale));
+            left: calc(0.125rem * var(--mantine-scale));
+            width: calc(1rem * var(--mantine-scale));
+            height: calc(1rem * var(--mantine-scale));
+            background-color: var(--mantine-color-white);
+            border-radius: 50%;
+            box-shadow: var(--mantine-shadow-xs);
+            transition: transform var(--app-shell-transition-duration) var(--app-shell-transition-timing-function);
+        }
+        .mantine-Switch-root input:checked + .mantine-Switch-track .mantine-Switch-thumb {
+            transform: translateX(calc(1.25rem * var(--mantine-scale)));
+        }
+        .mantine-Switch-label {
+            font-family: var(--mantine-font-family);
+            font-size: var(--mantine-font-size-sm);
+            color: var(--hg-dark-gray);
+            font-weight: 500;
+        }
+        
+        /* Chart controls container */
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--mantine-spacing-md);
+        }
+        
+        /* Sidebar - Mantine AppShell Navbar */
+        .sidebar {
+            --nav-bar-background: var(--hg-very-dark-blue);
+            --animation-length: .15s;
+            --app-shell-navbar-z-index: calc(var(--mantine-z-index-app) + 1);
+            
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            top: 0;
+            height: 100dvh;
+            inset-inline-start: 0;
+            width: var(--app-shell-navbar-width);
+            background-color: var(--nav-bar-background);
+            color: #fff;
+            border-inline-end: 1px solid var(--app-shell-border-color);
+            border-right-color: var(--nav-bar-background);
+            transition: width var(--animation-length) ease-out;
+            z-index: var(--app-shell-navbar-z-index);
+        }
+        
+        /* Sidebar Header */
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--mantine-spacing-sm);
+            padding: var(--mantine-spacing-md);
+        }
+        .logo-svg { height: 24px; width: auto; }
+        .toggle-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: calc(1.75rem * var(--mantine-scale));
+            height: calc(1.75rem * var(--mantine-scale));
+            border-radius: var(--mantine-radius-sm);
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background var(--animation-length) ease;
+        }
+        .toggle-icon:hover { background: rgba(0, 0, 0, 0.12); }
+        .toggle-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+        
+        /* Filter Section - White card inside dark sidebar */
+        .filter-wrapper {
+            margin: var(--mantine-spacing-md);
+            padding: var(--mantine-spacing-md);
+            background: var(--mantine-color-white);
+            border-radius: var(--mantine-radius-lg);
+            box-shadow: var(--mantine-shadow-sm);
+        }
+        .filter-pill {
+            display: flex;
+            align-items: center;
+            gap: var(--mantine-spacing-md);
+            padding: 0;
+            margin-bottom: var(--mantine-spacing-md);
+            cursor: pointer;
+        }
+        .filter-pill svg { 
+            width: 18px; 
+            height: 18px; 
+            stroke: var(--hg-dark-gray); 
+            fill: none;
+            stroke-width: 1.5;
+        }
+        .filter-pill span { 
+            font-size: var(--mantine-font-size-md); 
+            color: var(--hg-dark-gray);
+            font-weight: 500;
+        }
+        .env-pill {
+            display: block;
+            width: 100%;
+            padding: var(--mantine-spacing-sm) var(--mantine-spacing-lg);
+            background: var(--mantine-color-gray-1);
+            border: 1px solid var(--mantine-color-gray-3);
+            border-radius: 9999px;
+            font-size: var(--mantine-font-size-sm);
+            color: var(--hg-dark-gray);
+            cursor: pointer;
+            text-align: left;
+        }
+        
+        /* Navigation Scroll Area */
+        .nav-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--mantine-spacing-md);
+        }
+        .nav-content {
+            display: flex;
+            flex-direction: column;
+            gap: calc(2rem * var(--mantine-scale));
+        }
+        
+        /* Dashboard Button */
+        .dashboard-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: var(--mantine-spacing-sm) var(--mantine-spacing-xs);
+            background: transparent;
+            border: none;
+            border-radius: var(--mantine-radius-sm);
+            color: white;
+            font-size: var(--mantine-font-size-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: background var(--animation-length) ease;
+        }
+        .dashboard-btn:hover { background: rgba(0, 0, 0, 0.12); }
+        .dashboard-btn-inner {
+            display: flex;
+            align-items: center;
+            gap: var(--mantine-spacing-sm);
+        }
+        .dashboard-btn .nav-icon { 
+            width: 24px; 
+            height: 24px; 
+            filter: brightness(0) invert(1);
+        }
+        .dashboard-btn svg.nav-icon {
+            filter: none;
+            stroke: currentColor;
+            fill: none;
+        }
+        .dashboard-btn .arrow-icon { 
+            width: 24px; height: 24px; 
+            transition: transform var(--animation-length) ease;
+        }
+        .dashboard-btn.open .arrow-icon { transform: rotate(90deg); }
+        
+        /* Section Title */
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: var(--mantine-heading-font-weight);
+            color: var(--mantine-color-gray-5);
+            text-transform: uppercase;
+            margin-bottom: var(--mantine-spacing-xs);
+            padding-left: var(--mantine-spacing-xs);
+        }
+        
+        /* Nav List */
+        .nav-list {
+            list-style: none;
+            margin: 0;
+            padding: 0 0 0 var(--mantine-spacing-sm);
+            display: flex;
+            flex-direction: column;
+            gap: var(--mantine-spacing-xs);
+        }
+        .nav-list-item {
+            display: flex;
+            align-items: center;
+            gap: var(--mantine-spacing-sm);
+            padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+            border-radius: var(--mantine-radius-sm);
+            cursor: pointer;
+            transition: background var(--animation-length) ease;
+        }
+        .nav-list-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .nav-list-item.active { color: var(--hg-sky-blue); }
+        .nav-list-item .nav-icon { 
+            width: 16px; 
+            height: 16px; 
+            flex-shrink: 0;
+            filter: brightness(0) invert(1); /* Make PNG icons white */
+        }
+        .nav-list-item svg.nav-icon {
+            filter: none; /* SVG icons use stroke color instead */
+            stroke: currentColor;
+            fill: none;
+        }
+        .nav-list-item span {
+            font-size: var(--mantine-font-size-sm);
+            line-height: var(--mantine-line-height-sm);
+            color: inherit;
+        }
+        
+        /* Sidebar Footer */
+        .sidebar-footer {
+            padding: 0 var(--mantine-spacing-md) var(--mantine-spacing-md);
+            max-width: var(--content-nav-width);
+        }
+        .sidebar-divider {
+            height: 1px;
+            background: color-mix(in srgb, var(--mantine-color-veryLightGray-filled), transparent 50%);
+            margin-bottom: var(--mantine-spacing-md);
+        }
+        .footer-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: var(--mantine-spacing-xs);
+        }
+        .footer-list .nav-list-item { padding-left: var(--mantine-spacing-xs); }
+        .version-text {
+            font-size: var(--mantine-font-size-xs);
+            color: var(--mantine-color-gray-5);
+            padding: var(--mantine-spacing-xs);
+            margin-top: var(--mantine-spacing-xs);
+        }
+        .version { color: #666; font-size: 11px; margin-top: 8px; padding: 4px; }
+        
+        /* Main */
+        .main { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            background: var(--base-background-color);
+            margin-inline-start: var(--app-shell-navbar-offset);
+            width: calc(100% - var(--app-shell-navbar-offset));
+        }
+        
+        /* Top Header - Exact Mantine AppShell Header styling */
+        .top-header {
+            background-color: var(--mantine-color-body);
+            height: var(--app-shell-header-height);
+            display: grid;
+            grid-template-columns: max-content min-content minmax(10vw,1fr) repeat(2,min-content);
+            grid-auto-flow: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0 1em;
+            border-bottom: 1px solid var(--app-shell-border-color);
+            z-index: var(--mantine-z-index-app);
+            transition-duration: var(--app-shell-transition-duration);
+            transition-timing-function: var(--app-shell-transition-timing-function);
+        }
+        .header-title { 
+            font-weight: 600; 
+            font-size: calc(0.75rem * var(--mantine-scale)); 
+            color: var(--hg-dark-gray); 
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .share-link { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            color: var(--hg-teal); 
+            font-size: calc(0.8125rem * var(--mantine-scale));
+            cursor: var(--mantine-cursor-type);
+            white-space: nowrap;
+        }
+        .share-link svg { width: 16px; height: 16px; }
+        .spacer { flex: 1; }
+        
+        /* Mantine-style Search Input for Header */
+        .header-search {
+            font-family: var(--mantine-font-family);
+            background-color: var(--mantine-color-white);
+            border: 1px solid var(--mantine-color-gray-3);
+            border-radius: var(--mantine-radius-md);
+            padding: calc(0.5rem * var(--mantine-scale)) calc(0.75rem * var(--mantine-scale));
+            font-size: var(--mantine-font-size-sm);
+            color: var(--mantine-color-placeholder);
+            display: flex;
+            align-items: center;
+            gap: calc(0.5rem * var(--mantine-scale));
+            min-width: 180px;
+            cursor: var(--mantine-cursor-type);
+            transition: border-color 150ms ease;
+        }
+        .header-search:hover {
+            border-color: var(--mantine-color-gray-4);
+        }
+        .header-search:focus-within {
+            border-color: var(--hg-cta-blue);
+            outline: none;
+        }
+        .header-search svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--mantine-color-gray-5);
+            flex-shrink: 0;
+        }
+        .header-search-text {
+            color: var(--mantine-color-placeholder);
+            font-size: var(--mantine-font-size-sm);
+        }
+        
+        .header-icons { display: flex; gap: 4px; color: var(--mantine-color-gray-6); align-items: center; }
+        .header-icons span { 
+            width: calc(2.25rem * var(--mantine-scale)); 
+            height: calc(2.25rem * var(--mantine-scale)); 
+            display: flex; align-items: center; justify-content: center;
+            cursor: var(--mantine-cursor-type); 
+            font-size: 16px;
+            border-radius: var(--mantine-radius-sm);
+            transition: background-color 150ms ease;
+        }
+        .header-icons span:hover { background: var(--mantine-color-gray-0); }
+        
+        /* Sub Header - Second row with tabs and actions */
+        .sub-header {
+            background: var(--mantine-color-body);
+            display: flex;
+            align-items: stretch;
+            height: var(--main-tabs-height);
+            border-bottom: 1px solid var(--app-shell-border-color);
+            box-sizing: border-box;
+        }
+        
+        /* Action bar - right side with buttons */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--mantine-spacing-sm);
+            justify-content: flex-end;
+            background-color: var(--base-background-color);
+            height: 100%;
+            padding: 0 var(--global-padding);
+            margin-left: auto;
+            min-width: max-content;
+        }
+        
+        /* Mantine Button - Updated with exact Hyperglance specs */
+        .mantine-Button-root {
+            font-family: var(--mantine-font-family);
+            cursor: var(--mantine-cursor-type);
+            border: none;
+            border-radius: var(--mantine-radius-xl);
+            font-weight: 500;
+            font-size: var(--mantine-font-size-sm);
+            padding: calc(0.5rem * var(--mantine-scale)) calc(1rem * var(--mantine-scale));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: calc(0.5rem * var(--mantine-scale));
+            transition: background-color var(--app-shell-transition-duration) var(--app-shell-transition-timing-function),
+                        border-color var(--app-shell-transition-duration) var(--app-shell-transition-timing-function),
+                        color var(--app-shell-transition-duration) var(--app-shell-transition-timing-function);
+            white-space: nowrap;
+            line-height: 1;
+            height: calc(2.25rem * var(--mantine-scale));
+        }
+        .mantine-Button-root.filled {
+            background-color: var(--mantine-color-ctaBlue-7);
+            color: var(--mantine-color-white);
+            box-shadow: var(--mantine-shadow-xs);
+        }
+        .mantine-Button-root.filled:hover {
+            background-color: var(--hg-blue);
+        }
+        .mantine-Button-root.outline {
+            background-color: var(--mantine-color-white);
+            border: 1px solid var(--mantine-color-gray-4);
+            color: var(--hg-dark-gray);
+            box-shadow: var(--bp-button-box-shadow);
+        }
+        .mantine-Button-root.outline:hover {
+            background-color: var(--mantine-color-gray-0);
+            border-color: var(--mantine-color-gray-5);
+        }
+        .mantine-Button-root svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
         
         /* Dashboard Title */
-        .dashboard-title-section { padding: 16px 24px; background: #f5f7fa; }
-        .dashboard-title { display: flex; align-items: center; gap: 12px; background: #e0e7ff; padding: 8px 16px; border-radius: 20px; width: fit-content; }
-        .dashboard-title-text { font-weight: 600; color: #1e2a3b; font-size: 16px; }
-        .dashboard-badge { background: #64748b; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+        .dashboard-title-bar { 
+            padding: var(--mantine-spacing-md) var(--global-padding); 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .overview-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #f5f0ff 0%, #eef4ff 100%);
+            padding: 8px 18px;
+            border-radius: 20px;
+        }
+        .overview-pill .star { color: #7c3aed; font-size: 14px; }
+        .overview-text { font-size: 16px; font-weight: 600; color: var(--hg-dark-gray); }
+        .dropdown-arrow { color: #888; margin-left: 4px; font-size: 12px; }
+        .kpi-toggle {
+            display: flex;
+            align-items: center;
+        }
         
-        /* Toggle Section */
-        .toggle-section { padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; background: #fff; margin: 0 24px 16px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .toggle-label { font-size: 14px; color: #1e2a3b; font-weight: 500; }
-        .toggle-value { font-weight: 600; }
-        .toggle-group { display: flex; background: #f1f5f9; border-radius: 8px; padding: 4px; gap: 4px; }
-        .toggle-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; background: transparent; color: #64748b; transition: all 0.2s; }
-        .toggle-btn.active { color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .toggle-btn.unblended.active { background: #fbbf24; }
-        .toggle-btn.amortized.active { background: #f97316; }
-        .toggle-btn.both.active { background: #6366f1; }
+        /* Provider Cards - Exact Hyperglance Mantine styling */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--mantine-spacing-md);
+            padding: 0 var(--global-padding) var(--global-padding);
+        }
         
-        /* Provider Cards */
-        .provider-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 24px 16px; }
-        .provider-card { background: #fff; border-radius: 8px; overflow: hidden; }
-        .provider-card.aws { border: 3px solid #fbbf24; }
-        .provider-card.azure { border: 3px solid #3b82f6; }
-        .provider-card.gcp { border: 3px solid #f97316; }
-        .provider-card.k8s { border: 3px solid #6366f1; }
-        .provider-card-header { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: center; }
-        .aws-badge { background: #1e2a3b; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; }
-        .provider-card-body { padding: 16px; text-align: center; }
-        .provider-name { color: #64748b; font-size: 14px; margin-bottom: 4px; }
-        .provider-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-        .stat-value { font-size: 24px; font-weight: 600; color: #1e2a3b; }
-        .stat-value.amortized-color { color: #f97316; }
-        .stat-label { color: #94a3b8; font-size: 12px; }
-        .stat-dual .stat-primary { font-size: 18px; font-weight: 600; color: #fbbf24; }
-        .stat-dual .stat-secondary { font-size: 14px; font-weight: 600; color: #f97316; }
-        .stat-dual .stat-label { font-size: 11px; }
+        /* Dashboard Widget - Provider Card Base */
+        .dashboards-widget {
+            --paper-shadow: var(--mantine-shadow-xs);
+            background-color: var(--mantine-color-white);
+            border-radius: var(--mantine-radius-md);
+            box-shadow: var(--paper-shadow);
+            overflow: hidden;
+            border-top: 4px solid var(--datasource-color);
+        }
         
-        /* Charts Section */
-        .charts-section { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; padding: 0 24px 16px; }
-        .chart-card { background: #fff; border-radius: 8px; padding: 20px; }
+        /* Provider-specific colors */
+        .dashboards-widget.aws { --datasource-color: #FF9900; }
+        .dashboards-widget.azure { --datasource-color: #008AD8; }
+        .dashboards-widget.gcp { --datasource-color: #34A853; }
+        .dashboards-widget.k8s { --datasource-color: #326CE5; }
+        
+        /* Widget Title - h4 styling */
+        .widget-title {
+            display: flex;
+            align-items: center;
+            gap: var(--mantine-spacing-sm);
+            padding: var(--mantine-spacing-md);
+            margin: 0;
+            font-family: var(--mantine-font-family-headings);
+            font-size: var(--mantine-h4-font-size);
+            font-weight: 700;
+            line-height: var(--mantine-h4-line-height);
+            color: var(--hg-dark-gray);
+            background-color: color-mix(in srgb, var(--datasource-color) 8%, white);
+        }
+        
+        /* Image span for logo */
+        .image-span {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            flex-shrink: 0;
+        }
+        
+        /* Stats grid */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background-color: color-mix(in srgb, var(--datasource-color) 5%, white);
+        }
+        
+        .stats > div {
+            padding: var(--mantine-spacing-md) var(--mantine-spacing-sm);
+            text-align: center;
+            border-top: 1px solid color-mix(in srgb, var(--datasource-color) 15%, transparent);
+            font-size: var(--mantine-font-size-xs);
+            color: var(--mantine-color-gray-6);
+        }
+        
+        .stats > div:nth-child(odd) {
+            border-right: 1px solid color-mix(in srgb, var(--datasource-color) 15%, transparent);
+        }
+        
+        .stats .value {
+            font-size: calc(1.5rem * var(--mantine-scale));
+            font-weight: 600;
+            color: var(--hg-dark-gray);
+            line-height: 1.2;
+            margin-bottom: calc(0.25rem * var(--mantine-scale));
+        }
+        
+        /* Legacy provider-card support - map to new structure */
+        .provider-card {
+            --paper-shadow: var(--mantine-shadow-xs);
+            background-color: var(--mantine-color-white);
+            border-radius: var(--mantine-radius-md);
+            box-shadow: var(--paper-shadow);
+            overflow: hidden;
+        }
+        .provider-card.aws { --datasource-color: #FF9900; border-top: 4px solid #FF9900; }
+        .provider-card.azure { --datasource-color: #008AD8; border-top: 4px solid #008AD8; }
+        .provider-card.gcp { --datasource-color: #34A853; border-top: 4px solid #34A853; }
+        .provider-card.k8s { --datasource-color: #326CE5; border-top: 4px solid #326CE5; }
+        
+        .card-logo {
+            padding: var(--mantine-spacing-md);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: color-mix(in srgb, var(--datasource-color) 8%, white);
+        }
+        
+        .card-logo img { height: 32px; width: auto; }
+        .card-logo svg { height: 32px; width: auto; }
+        
+        .card-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--mantine-spacing-sm);
+            padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+            font-family: var(--mantine-font-family-headings);
+            font-size: var(--mantine-h4-font-size);
+            font-weight: 700;
+            line-height: var(--mantine-h4-line-height);
+            color: var(--hg-dark-gray);
+            background-color: color-mix(in srgb, var(--datasource-color) 8%, white);
+        }
+        
+        .card-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background-color: color-mix(in srgb, var(--datasource-color) 5%, white);
+        }
+        
+        .stat-cell {
+            padding: var(--mantine-spacing-md) var(--mantine-spacing-sm);
+            text-align: center;
+            border-top: 1px solid color-mix(in srgb, var(--datasource-color) 15%, transparent);
+        }
+        .stat-cell:nth-child(odd) { 
+            border-right: 1px solid color-mix(in srgb, var(--datasource-color) 15%, transparent); 
+        }
+        .stat-value { 
+            font-size: calc(1.5rem * var(--mantine-scale)); 
+            font-weight: 600; 
+            color: var(--hg-dark-gray);
+            line-height: 1.2;
+        }
+        .stat-label { 
+            font-size: var(--mantine-font-size-xs); 
+            color: var(--mantine-color-gray-6); 
+            margin-top: calc(0.25rem * var(--mantine-scale)); 
+        }
+        
+        /* Kubernetes 3-column stats layout */
+        .k8s-stats {
+            grid-template-columns: 1fr 1fr;
+        }
+        .k8s-stats .k8s-full-width {
+            grid-column: 1 / -1;
+            border-right: none !important;
+        }
+        
+        /* Charts */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 16px;
+            padding: 0 20px 20px;
+        }
+        .chart-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e6e7eb;
+        }
         .chart-header { display: flex; align-items: center; margin-bottom: 16px; }
-        .chart-title { margin: 0; font-size: 16px; font-weight: 600; color: #1e2a3b; }
-        .chart-toggles { margin-left: auto; display: flex; gap: 8px; }
-        .chart-toggle-group { display: flex; background: #f1f5f9; border-radius: 6px; padding: 2px; }
-        .chart-toggle-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; background: transparent; color: #64748b; transition: all 0.2s; }
-        .chart-toggle-btn.active { color: #fff; }
-        .chart-toggle-btn.unblended.active { background: #fbbf24; }
-        .chart-toggle-btn.amortized.active { background: #f97316; }
-        .chart-toggle-btn.both.active { background: #6366f1; }
-        .chart-toggle-btn.time.active { background: #1e2a3b; }
+        .chart-title { font-size: 15px; font-weight: 600; color: var(--hg-dark-gray); margin-right: auto; }
         .legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
-        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #64748b; }
-        .legend-color { width: 12px; height: 12px; border-radius: 2px; }
-        .legend-line { width: 12px; height: 3px; border-radius: 2px; }
-        .chart-container { height: 280px; position: relative; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 2px; }
+        .legend-line { width: 16px; height: 2px; border-radius: 1px; }
+        .chart-container { height: 280px; }
         
-        /* Definitions */
-        .definitions { margin: 0 24px 24px; padding: 20px; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .definitions h4 { margin: 0 0 16px; font-size: 14px; font-weight: 600; color: #1e2a3b; }
-        .definitions-grid { display: flex; gap: 32px; flex-wrap: wrap; }
-        .definition { flex: 1; min-width: 200px; }
-        .definition h5 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-        .definition h5.blue { color: #3b82f6; }
-        .definition h5.purple { color: #8b5cf6; }
-        .definition h5.orange { color: #f59e0b; }
-        .definition p { color: #64748b; font-size: 12px; margin: 0; line-height: 1.5; }
+        @media (max-width: 1200px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-row { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
         
-        .spacer { flex: 1; }
+        /* Cost Explanation Section */
+        .cost-explanation {
+            padding: 0 20px 20px;
+        }
+        .explanation-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e6e7eb;
+        }
+        .explanation-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e6e7eb;
+        }
+        .explanation-icon {
+            font-size: 24px;
+        }
+        .explanation-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--hg-dark-gray);
+        }
+        .explanation-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .explanation-item h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--hg-cta-blue);
+            margin-bottom: 10px;
+        }
+        .explanation-item p {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 900px) {
+            .explanation-content {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="app">
         <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="logo">
-                <span class="logo-text">hyperglance</span>
-                <span style="margin-left: auto; cursor: pointer;">≡</span>
+        <nav class="sidebar">
+            <!-- Header with Logo and Toggle -->
+            <div class="sidebar-header">
+                <div class="nav-bar-logo">
+                    <svg class="logo-svg" viewBox="0 0 516 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M27.8677 18.4067C21.1477 18.4067 16.0597 21.6707 12.7957 26.1827V0.742725H0.699711V69.0947H12.7957V41.3507C12.7957 32.5187 18.5557 28.8707 23.8357 28.8707C29.9797 28.8707 33.1477 31.9427 33.1477 38.2787V69.0947H45.2437V36.2627C45.2437 24.4547 38.2357 18.4067 27.8677 18.4067ZM83.0692 19.5587L79.0372 32.0387C76.3492 40.7747 73.6612 49.7987 71.0692 59.5907C68.5732 49.8947 65.8852 40.5827 63.1972 31.9427L59.1652 19.5587H46.1092L60.5092 60.2627C61.6612 63.5267 62.8132 67.2707 62.8132 70.2467C62.8132 74.3747 60.6052 78.2147 54.6532 78.2147H50.0452V87.7187C51.5812 87.9107 53.0212 88.0067 55.3252 88.0067C67.3252 88.0067 72.7012 84.1667 76.6372 73.1267L95.7412 19.5587H83.0692ZM125.941 18.4067C118.741 18.4067 113.461 21.4787 110.101 26.6627V19.5587H98.4847V87.9107H110.581V62.6627C113.941 67.4627 119.029 70.2467 125.941 70.2467C139.573 70.2467 148.117 60.0707 148.117 44.3267C148.117 28.5827 139.573 18.4067 125.941 18.4067ZM123.061 60.2627C115.189 60.2627 110.293 54.7907 110.293 44.3267C110.293 33.8627 115.189 28.3907 123.061 28.3907C130.933 28.3907 135.829 33.4787 135.829 43.9427C135.829 54.4067 130.933 60.2627 123.061 60.2627ZM200.504 45.1907C200.504 29.4467 191.192 18.4067 176.024 18.4067C161.336 18.4067 151.544 28.7747 151.544 44.3267C151.544 60.1667 161.624 70.2467 176.216 70.2467C188.12 70.2467 196.76 63.8147 199.256 53.7347H187.64C185.816 58.1507 182.072 60.8387 176.312 60.8387C169.304 60.8387 164.312 56.9027 163.448 48.0707H200.504V45.1907ZM175.928 27.8147C183.128 27.8147 187.448 32.6147 188.408 39.6227H163.544C164.696 31.4627 169.496 27.8147 175.928 27.8147ZM232.891 18.7907C225.211 18.7907 220.507 22.8227 218.107 28.3907V19.5587H206.395V69.0947H218.491V43.9427C218.491 34.5347 223.867 30.1187 232.795 30.1187H235.867V18.9827C234.811 18.7907 233.947 18.7907 232.891 18.7907Z" fill="url(#logoGrad)"/>
+                        <path d="M276.749 19.5587V26.3747C273.485 21.3827 268.301 18.4067 261.101 18.4067C247.565 18.4067 238.829 28.4867 238.829 43.6547C238.829 58.7267 247.757 68.9027 261.197 68.9027C268.109 68.9027 273.101 66.1187 276.365 61.5107V67.7507C276.365 75.5267 272.141 79.7507 264.173 79.7507C257.549 79.7507 253.709 77.0627 253.133 71.7827H241.229C241.997 82.0547 249.677 89.0627 263.981 89.0627C280.109 89.0627 288.461 80.5187 288.461 67.4627V19.5587H276.749ZM263.885 58.9187C256.109 58.9187 251.213 53.3507 251.213 43.7507C251.213 34.1507 256.109 28.3907 263.885 28.3907C271.757 28.3907 276.653 33.7667 276.653 43.6547C276.653 53.4467 271.757 58.9187 263.885 58.9187ZM296.305 69.0947H308.401V0.742725H296.305V69.0947ZM360.772 69.0947C359.428 67.1747 358.756 63.2387 358.756 59.6867V33.2867C358.756 24.3587 352.9 18.4067 338.116 18.4067C322.66 18.4067 316.516 24.8387 315.844 35.3027H327.748C328.228 29.2547 331.108 27.4307 338.02 27.4307C345.028 27.4307 347.044 29.7347 347.044 33.5747C347.044 37.2227 344.644 38.6627 340.036 39.2387L332.548 39.9107C318.532 41.2547 313.54 47.1107 313.54 55.3667C313.54 64.9667 320.836 70.2467 331.396 70.2467C338.692 70.2467 344.068 67.6547 347.332 63.0467C347.524 65.4467 347.908 67.7507 348.676 69.0947H360.772ZM334.276 61.6067C328.708 61.6067 325.924 59.0147 325.924 54.8867C325.924 50.9507 328.132 48.5507 334.852 47.7827L341.38 47.0147C343.972 46.7267 345.796 46.1507 347.044 44.9987V49.5107C347.044 58.1507 340.708 61.6067 334.276 61.6067ZM393.226 18.4067C386.218 18.4067 380.938 21.9587 377.77 26.6627V19.5587H366.058V69.0947H378.154V41.3507C378.154 32.5187 383.914 28.8707 389.194 28.8707C395.338 28.8707 398.506 31.9427 398.506 38.2787V69.0947H410.602V36.2627C410.602 24.4547 403.594 18.4067 393.226 18.4067ZM440.785 70.2467C453.457 70.2467 462.673 62.7587 464.017 50.6627H451.921C450.961 57.1907 446.257 60.1667 440.785 60.1667C433.777 60.1667 428.689 55.1747 428.689 44.3267C428.689 33.4787 433.585 28.4867 440.785 28.4867C446.161 28.4867 450.577 31.2707 451.729 37.4147H463.825C462.385 25.7987 453.745 18.4067 440.785 18.4067C426.001 18.4067 416.305 28.4867 416.305 44.3267C416.305 60.1667 426.097 70.2467 440.785 70.2467ZM515.658 45.1907C515.658 29.4467 506.346 18.4067 491.178 18.4067C476.49 18.4067 466.698 28.7747 466.698 44.3267C466.698 60.1667 476.778 70.2467 491.37 70.2467C503.274 70.2467 511.914 63.8147 514.41 53.7347H502.794C500.97 58.1507 497.226 60.8387 491.466 60.8387C484.458 60.8387 479.466 56.9027 478.602 48.0707H515.658V45.1907ZM491.082 27.8147C498.282 27.8147 502.602 32.6147 503.562 39.6227H478.698C479.85 31.4627 484.65 27.8147 491.082 27.8147Z" fill="white"/>
+                        <defs>
+                            <linearGradient id="logoGrad" x1="564.5" y1="30" x2="116.5" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop offset="0.432291" stop-color="#F0F0FF"/>
+                                <stop offset="1" stop-color="#02BAFF"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <button class="toggle-icon">
+                    <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 17l-18 0"/><path d="M6 10l-3 -3l3 -3"/><path d="M3 7l18 0"/><path d="M18 20l3 -3l-3 -3"/>
+                    </svg>
+                </button>
             </div>
             
-            <div class="filter-section">
-                <div class="filter-label"><span>▽</span><span>Filter By</span></div>
-                <div class="filter-dropdown">All Environments ▾</div>
+            <!-- Filter Section -->
+            <div class="filter-wrapper">
+                <div class="filter-pill">
+                    <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20l-3 1v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v3"/>
+                        <path d="M19 16v6"/><path d="M22 19l-3 3l-3 -3"/>
+                    </svg>
+                    <span>Filter By</span>
+                </div>
+                <div class="env-pill">All Environments</div>
             </div>
             
-            <div class="nav-section">
-                <div class="nav-group-title"><span>📊</span><span>Dashboards</span><span style="margin-left: auto;">▾</span></div>
-                <div class="nav-item active"><span>✦</span>Overview</div>
-                <div class="nav-item"><span>☁</span>AWS</div>
-                <div class="nav-item"><span>💰</span>Cost Overview</div>
-                <div class="nav-item"><span>☁</span>Azure</div>
-                <div class="nav-item"><span>⎈</span>Kubernetes</div>
-                <div class="nav-item"><span>☁</span>GCP</div>
-                
-                <div class="nav-title">ANALYZE</div>
-                <div class="nav-item"><span>📈</span>Cost Explorer</div>
-                <div class="nav-item"><span>📊</span>Trends & Anomalies</div>
-                
-                <div class="nav-title">OPTIMIZE</div>
-                <div class="nav-item"><span>🗑</span>Wastage</div>
-                <div class="nav-item"><span>📋</span>Commitments</div>
-                <div class="nav-item"><span>📐</span>Right Sizing</div>
-                
-                <div class="nav-title">ALLOCATE</div>
-                <div class="nav-item"><span>📄</span>Billing Report</div>
-                <div class="nav-item"><span>📊</span>Budgets</div>
-                
-                <div class="nav-title">INVENTORY</div>
-                <div class="nav-item"><span>🔗</span>Infra Diagram</div>
-                <div class="nav-item"><span>🔍</span>Search</div>
-                <div class="nav-item"><span>📏</span>Rules</div>
+            <!-- Navigation Content -->
+            <div class="nav-scroll">
+                <div class="nav-content">
+                    <!-- Dashboards Section -->
+                    <div>
+                        <button class="dashboard-btn open">
+                            <span class="dashboard-btn-inner">
+                                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 4h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1"/>
+                                    <path d="M5 16h4a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1"/>
+                                    <path d="M15 12h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1"/>
+                                    <path d="M15 4h4a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1"/>
+                                </svg>
+                                <span>Dashboards</span>
+                            </span>
+                            <svg class="arrow-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M6 9l6 6l6 -6"/></svg>
+                        </button>
+                        
+                        <ul class="nav-list">
+                            <li class="nav-list-item active">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEYSURBVHgB1ZHLDYJAEIYHwuNKCXjkFaUC7UA70A7ETrQDqQA7UCtAQ+CqJXDn5T8EjVFRgyf/ZJnZ3cm/Mx9Ef6kwDPUkSQJEra1GpC8ky/KoqqqJJEneT0aCIIzrYlGc/mQEDZqoR1E06mQELmyioysP46WIk05G4FN3U5blHkY+jKavoAv8wR/hV+Z35wfTNBecxHEcIAwsy+rxWOC05XsYps0DC9u2D2KzOWNxJLyqYXl3LLijIyeO4+xQs+IRr/Uw1m8dPTDRMM4JqZ9l2VpRlBDFM8MwfHqjJ0au66ZXFqqqDvmsKIojfVAb7A0Wj7hEPDMD6mLELNig2X7sptWIBZA1E/AJ6AtJbRd5ni8Buo90T3+pC7tVfd54ROyJAAAAAElFTkSuQmCC" alt="Overview">
+                                <span>Overview</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFKSURBVHgB7VLJbYNQEP1gtlvcAb6CQIEOSAVQQjrAqSDuIOkgSQUhHUAFELEecQc+gtjyJrIjIxT5ECknj/Q1wyzvv3kfxq52ybjzjzRNndVqdYtw37ZtQjnbtuuiKDxd14Msy6yu62r0OIIgqOj5oDr18TNUjtsMw/CJ0JdlWZUk6TGOY2uaphf4Nc/zT6IoegByx3GMFEX5mZ0BofEGzsHgGoAcvI1BAnoDAwvDDCAhXYjjN02zBKIb0eiZprnDILFi8CHAXayzIzYAedU0rcaad6hFxPg3jZ6JFU7d9310XNczDGOb5/k78g9g6iBtIa/SNwGzvxgJT4+zWI0KVVX5WHFzCYRkgHPA6v7UP1utLEt6NdJDhY+gSQJ/wJo1xCaBaciiOuIAeRuabhdA54AQ08X5fsEjQIJ4jxNgODwxw390YFf7X/sCRVOx6uMnnB4AAAAASUVORK5CYII=" alt="AWS">
+                                <span>AWS</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEjSURBVHgBtZPNkYJAEIWb/+JmCFy5QQhEsGawhmAIawS7IbgZmIFmgJ64Tgge+SuwHzVjATqClr4DU0P3fPN6pofoTTJ0gTRNF47jLC3LOuR5Tp7nRUVRHOM4FrNAEvBnGMY35k3TJBhN09zLlG1Zlpsx0BxBAtd1UwXRaMU5e+TeBUkIdg1oWoGELW5AXM7PTEgf9jsAwc1EOTqtlKsOxDcT0YvitUuMNj7s5iGoruujbdvJvRgfibiCJnb8ehRHj/UdCV1i27Zr7qG1Lu77PkoT3RlVVbWjF8UbnTB2IO7SM//4p+e1DcNQXEHSFewLmi/BJW/UZPDWsiwL+G3N6W5AEuVm4AhCAAkTZeLRxn3IjaOxOy43Uj2Gm8Wl4Dzpk7oAlshxfA/eqrkAAAAASUVORK5CYII=" alt="Cost Overview">
+                                <span>Cost Overview</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEiSURBVHgB7ZLfkYIwEMYhBJ4tIffKwMxRwXEd0IF3FYgVnB1oB54VOFYgHTAODDxqCT7CMIDfOuLEiH/eNQ/JZrP7y7ebaNrrjjiOB3me/9F6L449ApimuW2aRmAN4BO34vU+Z5ZlAZLnuq4fVTDGPrBfY7+zbfv7aUVt2047COyormsfpoDtJ0niPwWiciip2xuG8Q9Fw3MCY/O+fl2AqAe4PZRcu6IoNqRE8gnOeXgXhIZOupJOt0+QdH07YyNV1RmUpuknIENFzcp13QiKxgprYFnWtBcEyFIJjjzP25PhOM4MsIVy/iM3ntNEMvG8v4CJ7gBNjuSsqqpCqPjSLh+CHuYYd+sfjbAEqh+qhAw6VTLG35rxPlBZllTGSnsPGgd17XrtgDRTvgAAAABJRU5ErkJggg==" alt="Azure">
+                                <span>Azure</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAG2SURBVHgBzZPLbcJAEIaNed5COnDOgOLtACqAVACpAFJBoIJABZAKCBVAKrCFEBxxCc6NN/kmWqMFR0SRcshK1u7Oznz7z+zYsv5oJH5ymE6nNdu2y9vttquUCn4Nms1mjUQi8czSMcyDzWbT+Q54BvI8L5/L5Zr7/b4FJK/N4fF4HLGvXwPaJiiTyXiHw6FtQCwgMk0uBDTwXS4Wi3oMhBpXpxEC6zEHzBVqo/jeACq+V22Xc4u5HAOl02lXL0VNiHSFsgb2fjKZLLMeYu8CezDSjINMI44hgJoEAhlQMx/bE6/nsA+NGEfqegbC8d6oi8/0gq25Wq3es9msu16vfexDoNIOfuQLWC60Uro+QnU1ZJJKpQIASvuGAG9kQbq3vGoemFzsiCKgrqnIMYICYDVg8jJjnlie/0P2pLvc7XYSXMXX15l8xZ76aD6fjwkoR0AptqQkKfM6LYIVSvKkUpUWMcqgisWifwJJetJHhroAWCU6R00MwrpTKpXaZ4pk0GAOt3q6IUfcFpodzf6RfV+veyhpRWexf03/Y33r+ggKhcKdabAvPbhlIJKtKxDqVbH+/fgEoeHl6q/ZHHMAAAAASUVORK5CYII=" alt="Kubernetes">
+                                <span>Kubernetes</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFSSURBVHgB3VLLbYNAEMVrmzMdhBwRn4QOcAUJJaSCQAXBHbiDKBWYVBCnAhAgznQQjggJyBu0E4Nl2Tl7JLSzb7Rv3rxBUW42FufAJEn09XodCCGehmHQJZziHjdN8+G6bnWViEhUVf1Cqp/tvFgc+r4PLctKp/jqEgnU1DhiPNZwPuIkzMO5x/1++lbMWFerYKKEOm7Q+cU0Tb9tWxdKvmVNz/M8minlpCgK6vhOnWedhIgMw9hKxRoU/8hSTeTsl+CRpNwZCQVUPHOORzRqJa+atOE4Gjbk8UhkZtd1PrwIaTx03UyJgfsTMhrRG22RRVLECkLHcXgju1OFtK0sy8LlcrmXEBEdhFRRTzzRlSuBpdxxzm9ZUcqKkL+VZfl6Mk6Fui5zDd+fl1AWj4QMYNYdwAf6T5R/BmzY2rYdjZMwCCBA4VM5GnkpKloGk9x4/AKND5Z0aCkFVwAAAABJRU5ErkJggg==" alt="GCP">
+                                <span>GCP</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Analyze Section -->
+                    <section>
+                        <h6 class="section-title">analyze</h6>
+                        <ul class="nav-list">
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADQSURBVHgB7VHLDYJAEF2WDWdL4EpCItuBdgAVSAfagVqBJWgH0glK+ByhBO+b7PrGqBFjiHgwHHjJZHZ+bz7L2Ii/weqTnOd5bIxxn8WWlfi+f6K3YD+Acz6FCrXWZN6IeB8CdD8IIWpMNYOZtMg/FWCFoCiKuqqq9aufbEyxsW1bQp87iZC8wOhHdN0iOSzLckd+0rBjxOae5zV0H5JHXevYSF6CYAWJ6Ihpmk4cx9kjFMDXKKUiKeWFdYF+5L6O+x7Lsixk34IIaAI2Yvi4Aj8xZJXn+4WOAAAAAElFTkSuQmCC" alt="Cost Explorer">
+                                <span>Cost Explorer</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACISURBVHgB7dGxDcMgEAXQzymiTjZwapqMkk2SFTIhKYA23iBeAM7Ycmdsc3brJyHBAZ+TAE5i3vsfdqBCrdkTTqjTbB2oDRqFEF7OuXdp7wKBGOMN0o7yy49hoNJiR8z8nKZfHAlSSnVExNOyLdTW5a9ma+0VQrOOUkofrfU/B67da40xd5xEeouhLLejOirFAAAAAElFTkSuQmCC" alt="Trends">
+                                <span>Trends &amp; Anomalies</span>
+                            </li>
+                        </ul>
+                    </section>
+                    
+                    <!-- Optimize Section -->
+                    <section>
+                        <h6 class="section-title">optimize</h6>
+                        <ul class="nav-list">
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADmSURBVHgB5ZLfCYMwEMaTGJ3DVxEfnKB0g45gJ2ndoBs0btANSidIQcVH3aAL+KffgQGRNgFf/SBc4t39uDuPsX2rqqpMax3aYgRzqGmaC+f87vv+aTOIIOM4ZnT3PO+xCWQg0zTleL6jKOqYRdwGEUIc+77PUM1hGIaX8UspW4ALa0VLCFWBJLWEYF4h/GqdJ9cfEHSFUVRJWZYMlo5K07SjPxcEwRMxuROEmZxxQvOmtsgComZIkSTJdZ33c0ZL1XWt0eaNKv0HcYLmVlpcOxuEZN0js4QuCEnanPMSfuI4Lth+9QXKRoGQqCKQVwAAAABJRU5ErkJggg==" alt="Wastage">
+                                <span>Wastage</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAD0SURBVHgB7VHLDYJAFGSBwNUSvBICkQ6wA+1AKrAEtALtwFiBWgFYAYTwuVICZxLAeYmbIAJy8cYkm5332dn3EYQZv8D6nEEQLFVVvTRNY8MMy7LcSpK0wnGJW5aVd9+IfUKKotyqqnrqus7qun6QqGmad86FqUiSpBmyu7HRihhjfpZlLvH3HXb5VCEHrW3od9y2KIrbOI53nAv/xNfW0jTdY6gHVLXgPmyvwMbOmqYdEfeodeKDQlEUbfDghPLXSMy5H7NZQtzDcWRZzjk3DMPnOR8zwk8rJFzbIgSyyQ9qt3k7R+4IFaimd73t2FjejGG8ABQPhIojc3DxAAAAAElFTkSuQmCC" alt="Commitments">
+                                <span>Commitments</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADJSURBVHgB7ZJNDoIwFIRpN4QdR8A13IEj6A0sJ9AjcDRvAATo1noD3PfHwUhS+Ulr3DJJ80HmdV7z2iDY9bc455eu666uOrJlVFWVhGF4NMYw/MaU0lIp1WRZVnsF9X1/BxIsgZAbISQGn+9iQvLJS9P0YO+j8yCtdTER3QuwQZDAN7O9+b5FELoyoAZPv3hrQTlOUIBnzCn29b6CcDsMGD4DFVEU5T7e2olqdBwHDphBSvnw9Nxq27Ycl6tu8x1Zz8DW4tp3+esFTyd8kpJn8M4AAAAASUVORK5CYII=" alt="Right Size">
+                                <span>Right Sizing</span>
+                            </li>
+                        </ul>
+                    </section>
+                    
+                    <!-- Allocate Section -->
+                    <section>
+                        <h6 class="section-title">allocate</h6>
+                        <ul class="nav-list">
+                            <li class="nav-list-item">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 10l-2 -6"/><path d="M7 10l2 -6"/><path d="M13 20h-5.756a3 3 0 0 1 -2.965 -2.544l-1.255 -7.152a2 2 0 0 1 1.977 -2.304h13.999a2 2 0 0 1 1.977 2.304"/><path d="M10 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/><path d="M21 15h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5"/><path d="M19 21v1m0 -8v1"/></svg>
+                                <span>Cost Centers</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADHSURBVHgB5VPRDYIwEG0LAzgCvwQ6gyPgCDiBbiAjuAF1I5O23zKCA7Spr4kSrCWWT+WSy+Ve7t69gyshf2s0BiqlWudc8VZI6b2u6/McEYuRoOkwxbIs2yKctNY9SVUkpex85Jx3IYYBBdxVVbX/qig6jdKBMdZg3QG+g+pjWJPPNT9X7EHQlmUpkHu4QH611m6SifBhBYII8nHNxYqmmFdnjCGLiEJFL/thRf5X+4NEQ6zeq2rgHxee/ETGyXl+wzlcyHrsAfi/WOGWyH9kAAAAAElFTkSuQmCC" alt="Billing Report">
+                                <span>Billing Report</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACoSURBVHgB5ZLNCQMhEIXHUTxvCbl7iRWEdJJOQjpICekkpAIvereEFOBPdiABI7qbQxYW9gORN74ZZhgBtoe1dk+np2tYHTDG7IQQJ875gXSM8UF3qUMIN621L/OwLiSlvDPGBugzkAfmcM7l1iil/ngmRyNTSukCEyDiWSn1lYuwFK22f/H8raP1FRKNmB/XfM05P1sJ7z/mYa6jcbXHXhGC3sgD2+EFKudOZJsOojgAAAAASUVORK5CYII=" alt="Budgets">
+                                <span>Budgets</span>
+                            </li>
+                        </ul>
+                    </section>
+                    
+                    <!-- Inventory Section -->
+                    <section>
+                        <h6 class="section-title">inventory</h6>
+                        <ul class="nav-list">
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADDSURBVHgB3VC7EQIhFASPQi69gIAKLEXs5KxELMUKCIBYC+EjzxkcPD4yhrcJj9k3u28Xod0C90itNQ8hzDATQh7Lstxau4eeEMb4mmbvvUD/whgTanMNBP2AUmpFA+gKxX7O0zSdYI4xeW+3WnZechQ6wuucu7+dG6VXy85LBoEkAmiV/hVNSjlHR57+1lrBGHtuOegt54qLYBGiRNcLvLlojyuEUhRK6ZrHGeEKIXCD01PJoxzZRBMx+8cd/iPczvECeld26i4UKVkAAAAASUVORK5CYII=" alt="Diagram">
+                                <span>Infra Diagram</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADnSURBVHgB7VK7DcIwELWt/ErYINRpkg3ICEwAG4QNYAOSCYAJGAE2cJFfGzaALomSmDspojoJA22e5MLvnZ/vno6xCZ/AKVJKOXMcJ1JKbeC4QFVCiFNd10kQBA/qjaBMLMu69n0/b5om9DyPg9kK7gvkUWc6KMtyl+f5kdLSNI3h7LU6GoYBx0moYsMwYhhxzXQA3ahfdEFwFeTgUsXA+6hrGcFoZ9u2I6rYNM0t6lpGXdfFkNESA8+yzB87cYuiOHDOMZ+blhHuSdu2Ifx8h4cXzGRchydwIYT9/uAvoAmYSzbha7wA7KR/ObuTLQ0AAAAASUVORK5CYII=" alt="Search">
+                                <span>Search</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADYSURBVHgB5ZLBDYIwFIbbhnDVDcQjgYOdQDbRDRxB3UAnQCZRJ0AChKOOwBVIqP9LPBClqSZeCC9p2rz/9euf5mdsvJVl2booipVpjuuENE0DIcQGx8WrdVFKHX3fv/XNiz4HeZ4rQMK2bZO6rqXneXNAEsghad84JCc7Wr/qgv2pBgDinJf46JnuAnTHsqy7EdQ0zQlbEMex865RD6AljlcjSEpZUl5s2z53YZQr6iESkeu6jw+nTFOUJ7y+xaIATgGgYO4RyEPfvBbUBeLPJlVVReSWja+eExBiE9hnfQwAAAAASUVORK5CYII=" alt="Rules">
+                                <span>Rules</span>
+                            </li>
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAExSURBVHgB5VPLbYNQEHxA4Gx3EF/5KKGCyB3EFRBXEKggpAM6cKjASgVJKsASv6OTCswRCQGZkUCyQALLV6+0WrHvzezsPCHE7UaWZa95njtz96SpwyRJXEmSHGRR1/WPZVn+xURRFN2rqurKsnxs29ZtmmbLPr53IAzwvaqqKrBt+/ccJw+JNE37YgXgEWAfKr6ZIH1nT1GUE+7sh7gREQALlA/TNLfdeqc0TY8gaNnDip9oL4a4OzEODytQ1RIKfBDYncIIJcTZHsM2s4oQB2TRqyvLUjDPeyB/mFU0mOjRM4Kxktf11lBHxeGcogJkz/BlR18Mw1jBmyWMF+yhOr26SUW4uMF0Pv+BHsVx/NcpfeufHwPWo03ERICEZj9xNZCEuq4H4trA87/wNxG3G//NMZirz/v0sgAAAABJRU5ErkJggg==" alt="Automation">
+                                <span>Automation Log</span>
+                            </li>
+                        </ul>
+                    </section>
+                    
+                    <!-- Security & Compliance Section -->
+                    <section>
+                        <h6 class="section-title">Security &amp; Compliance</h6>
+                        <ul class="nav-list">
+                            <li class="nav-list-item">
+                                <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADzSURBVHgB7VLLDYJAEN1dhKuUwBUCMXRAB5ZgrECtQK1AS5AK1A6wAkgIcMUK9MrftwcTQYSoV95ldl9m3rzZWUIG/I0wDBdRFM368mgb6bquIoqiRSmdVlUlI1qgPcRDWZYXXde9XiF0XyNZQZGXJInNOUmSbrUiSleapu1fuVFTCA6sNE3npmnGTy4IgrcchJoQawrBzRVjyeRLsBaOz291FcGR0yuUZdmBMTYlHRAE4dQrhLe5Y7wz1r7jd2xQbrhZqaoaN+ta18/h+/4GnSd5ntuIR86hwdYwjE1b/kchDnwFpSiKJY5jOLEh4pABP+MBM5ZiHNiYW3QAAAAASUVORK5CYII=" alt="Framework">
+                                <span>Frameworks</span>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
             </div>
             
-            <div class="warning-box">
-                <span>⚠</span>
-                <span>Hyperglance experienced errors while collecting cloud data.</span>
-            </div>
-            
+            <!-- Footer -->
             <div class="sidebar-footer">
-                <div class="sidebar-footer-item"><span>⚙</span>Settings</div>
-                <div class="sidebar-footer-item"><span>❓</span>Help & Support</div>
-                <div class="version">v8.1.58 | 456df39</div>
+                <div class="sidebar-divider"></div>
+                <ul class="footer-list">
+                    <li class="nav-list-item">
+                        <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEjSURBVHgB5VLRrYJQDC3wgE99G/hLAgQmeO9t8JzAuIFuoBOoG7iBbqBOcE1gADYQf0kAT43Gey+KfutJCLS0p+1pid4WRttPIUTPtm1hGEZe13Xf9/39y0Sc7LruDIk5zOjyMPbw7UDaKYpiGsdxJud96UToYIKEf2oiAsmZ1HGcb7yUGFOPvnTyDAfdoRClaRqZpvkjubKyLPtVVf3xt+T/ZQkeEqH1Fd00IRAMwzBcB0GwBeFYCu1hPPGQCGN1ZRt6daQi+siKrYhtWVaMLjZckW10MU+S5Ah/F0VmUihvcKhMo1VhnZaoPqAWgGSBmxrJvsbW+E7oCe7FNO4IWxtjpCM+cyTwBq/iZ9eDRMy0QU4t4HPgTfISWD/P8zL6PJwArupv0pAplm0AAAAASUVORK5CYII=" alt="Settings">
+                        <span>Settings</span>
+                    </li>
+                    <li class="nav-list-item">
+                        <img class="nav-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFbSURBVHgB3VPLbYNAEAUUEEfSAT7yk0wHpARXELsC6ADoIK7ASQmpwOmASPyOSTrgiEBA3qwgWhEQyi3ySmjZ4c2b92ZYQbjZJW4BsizbD8Og0bvjOG9/JiqKwu/7PmIgUayIjHZJkp4Nw4jneGmJpCzLEIkBkk5t2+4sy9rZtn2PWAzyY57nl01FsHJE5RAkD6j8CWVXEHj49N40zUFVVQFkV2DOpmk+rSoCwAdJRCRJkmggIVsu2ZJlOaA4iE6IhavWKBHbvq7rVzq7rlvB1gH2KPlrwlHTQcQGMcXueCLI1pDACPi4oigJqwq7nPIKWG1REZRUnLKfRfbQH5dscWGdyIS1Rc1N0zTiY7yF8UyT++Bjv5rddV0MC/4s+TKpxK6PU434vMUfkhQByMCw+4Ke0QR19PARhQJYPaPh20QjmUeV8XhTDAQ0rXjpqmzetdESPdV8mv97fQNmFcX1dTfYFQAAAABJRU5ErkJggg==" alt="Help">
+                        <span>Help &amp; Support</span>
+                    </li>
+                </ul>
+                <p class="version-text">v8.1.50 | 456df39</p>
             </div>
-        </div>
+        </nav>
         
         <!-- Main Content -->
         <div class="main">
             <!-- Top Header -->
             <div class="top-header">
-                <span class="top-header-title">DASHBOARDS</span>
-                <div class="share-link"><span>🔗</span><span>Share this view</span></div>
+                <span class="header-title">DASHBOARDS</span>
+                <div class="share-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    Share this view
+                </div>
                 <div class="spacer"></div>
-                <div class="search-box"><span>🔍</span><span>Find resource...</span></div>
-                <div class="update-badge"><span>⚠</span>Update Required</div>
-                <div class="header-icons"><span>☰</span><span>⚡</span><span>👤</span></div>
-            </div>
-            
-            <!-- Sub Header -->
-            <div class="sub-header">
-                <div class="tab-active"><span>📊</span>Dashboards</div>
-                <div class="tab-inactive"><span>📅</span>Scheduled Reports</div>
-                <div class="spacer"></div>
-                <button class="header-btn"><span>+</span>New Dashboard</button>
-                <button class="header-btn-secondary"><span>📅</span>Create Scheduled Report</button>
-                <button class="header-btn-secondary">≡</button>
-            </div>
-            
-            <!-- Dashboard Title -->
-            <div class="dashboard-title-section">
-                <div class="dashboard-title">
-                    <span style="color: #6366f1;">✦</span>
-                    <span class="dashboard-title-text">Overview</span>
-                    <span class="dashboard-badge">SYSTEM DASHBOARD</span>
-                    <span>▾</span>
+                <div class="header-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <span class="header-search-text">Find resource...</span>
+                </div>
+                <div class="header-icons">
+                    <span>👤</span>
+                    <span>⚙</span>
                 </div>
             </div>
             
-            <!-- Toggle Section -->
-            <div class="toggle-section">
-                <div class="toggle-label">Cost View: <span class="toggle-value" id="toggleValueLabel">Unblended</span></div>
-                <div class="toggle-group">
-                    <button class="toggle-btn unblended active" onclick="setCostType('unblended')">Unblended</button>
-                    <button class="toggle-btn amortized" onclick="setCostType('amortized')">Amortized</button>
-                    <button class="toggle-btn both" onclick="setCostType('both')">Both</button>
+            <!-- Sub Header with Tabs -->
+            <div class="sub-header">
+                <div class="mantine-Tabs-list">
+                    <button class="mantine-Tabs-tab" data-active="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                        Dashboards
+                    </button>
+                    <button class="mantine-Tabs-tab" data-active="false">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                        Scheduled Reports
+                    </button>
+                </div>
+                <div class="action-bar">
+                    <button class="mantine-Button-root filled">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2"/></svg>
+                        New Dashboard
+                    </button>
+                    <button class="mantine-Button-root outline">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Create Scheduled Report
+                    </button>
+                </div>
+            </div>
+            
+            <div class="dashboard-title-bar">
+                <div class="overview-pill">
+                    <span class="star">✦</span>
+                    <span class="overview-text">Overview</span>
+                    <span class="mantine-Badge-root gray">SYSTEM DASHBOARD</span>
+                    <span class="dropdown-arrow">▾</span>
+                </div>
+                <div class="kpi-toggle">
+                    <div class="mantine-SegmentedControl-root cost-type-toggle">
+                        <button class="mantine-SegmentedControl-control" data-active="true" onclick="setKpiCostType('unblended')">Unblended</button>
+                        <button class="mantine-SegmentedControl-control" data-active="false" onclick="setKpiCostType('amortized')">Amortized</button>
+                        <button class="mantine-SegmentedControl-control" data-active="false" onclick="setKpiCostType('both')">Both</button>
+                    </div>
                 </div>
             </div>
             
             <!-- Provider Cards -->
-            <div class="provider-cards">
+            <div class="cards-grid">
                 <!-- AWS -->
-                <div class="provider-card aws">
-                    <div class="provider-card-header"><div class="aws-badge">aws</div></div>
-                    <div class="provider-card-body">
-                        <div class="provider-name">Amazon Web Services</div>
-                        <div class="provider-stats">
-                            <div><div class="stat-value">6</div><div class="stat-label">Accounts</div></div>
-                            <div><div class="stat-value">10,307</div><div class="stat-label">Resources</div></div>
-                            <div id="aws-cost"><div class="stat-value">$1.12K</div><div class="stat-label">Cost (30 Days)</div></div>
-                            <div><div class="stat-value">3,004</div><div class="stat-label">Compliance Alerts</div></div>
-                        </div>
+                <div class="mantine-Card-root provider-card aws">
+                    <div class="card-logo">
+                        <img src="data:image/webp;base64,UklGRgQHAABXRUJQVlA4WAoAAAAwAAAAJAAAFQAASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZBTFBIZgIAAA2QKNu2IUn7vcwe27Zt27Zt27Zt27Zt2/a0bWTmHeMPImICMOxKPQu4fJ23V1Wpv/qRkGzC/dXAtDj9ybwst/Ng8i3APhY94pNdfJBqFK1bzdqwQAr1sshdz3VPw9m8tuvOqu0N7J79CMd2bXRuV7U07hZlIesbacEy9pIKPuc0AbVOAW4vK+S9/7hgnqdGiqmjGu+lGeuj43hokVsAYkbFSxbx+Wtq05o3qM3mfCzq2HGPzuIbzqesAa1PWEoAw36fiOhpwxEO1m+6uzner7o8y8cOzMyn82yu+bbpUwE7gAP9JOGebBAUWvRz/Q9s6ZK4BotUlJkuWs92pXa1eSzkw6OHwi96Nge1rGeShCs4VS1Hhsj3YPFqxcahIza2g3gIaKcxsUNlZffNbMQn5piwA2DYSkSv6mJacLdw8h5rcu8JiTFtNB6xm3AX7o5nLKRwG3PSP9N8hiohvNHx8Z1Z3SXUC9jd1BXY2J7b4Ba8s0YCGIICTtYtyV2iRcO0dMcdyiVKr+4XaVroLD55UrjeUtoGEfs6EAkWDqFYOIQCWPg+cQcE0A7/0bCTlEsXcunl1d4PlPy7rPeJcOKWK106OHarl1rk36jAbJ5EzR4UacbYYcUYvBeF/J1yXKN3WJDUz8Eymr51m9/kxvSzIX8Xp8bQ/DSg9U6wuV9syPQSIypH3Dl+46NfpICKHjdTiZrFDTjUxIidtqwCbD1jeN+JCRMWrVUifULTdpTBL6O29seQA10UPzuoJWOTDGiYEtCm5ufAs3NuK42tWqlfgQivF+3zTJ8/Z+oEOsT15aM3oBAB8QUAVlA4IKgCAACQEACdASolABYAPk0gi0QioiEarAQAKATEtgBOmUJCYHF7SdkcPCYANwB+s36zeiB2AH9V6i/0APKj/ar4Pf2Z/Zn2cLtZox/iBk1poTSDugOMDgK/AGLWZnfpX2Df1c/1nYO9Cv9mRIB5hv7TmLM5MYNcA/7+t/hPOcx1ViJk1DFco3SOJcANbK+7SAAA/v6Kc0S7qmH1ssnajlQk+nLEKUx2sCnPQTBiFbSYA2prAK5kyTj9ybSbN4lKXNwaQb1C6BdsgsH93k76UzLfpwF1T3N8RNY0/Pu5XIc5j0xHMgjDDHrk7j5n8dNZnQ+aTBvWEBD5WtZWa4cY0vez1PVyLKU9RjWR218ptOqCdQJhMBkucaC9+Rrj3I74axeI1r2h+dPdFGZkQ+f3OfwQqZLN3ya2WRAPLWeycOB8ZU63x8GiTza+N7w1V5U6n7ONIM85/QG2wHobCGbxXfDGo30rAL03LxDgfGO8efxi1im1/YZPZwSX8ES+3nNh9nyyt/w2cYwjkUURrtmWZPcqv9/+kKr3ouEtt2ElJs/qOwW33ZZier8NXnpoFgMR72XdjTkbVGm9cGi0pEx3Le1O4LqQOfY9ARtyLG/aQLebBGse9FW1nbDgnp7bWGzHSTDX8TuIEPFOI4XeCW7ocPWflzxt6ebTq9FGq82SOHiWEIKvyq/NB6xm2Wi2PMmy95xppMAPNVMWoN/+ff5yvnl2eBjHw2ZP39fZ+lijQYQuRmUT6y/+/TCISBr9+MKTK4/bfgsf6Ez/f38li95hSIYJP+8mJBCCn4i0mLBViy+rLHbwv9z3B//lyfZjeDVwgVeF/M2DOseb0//LmDrM/3MrXrJ/a6bhBjYf7/7jef96RkCUtYv9SgwLp35N+A0K5YPhqlhFANqEj8/wAA==" alt="AWS" height="32">
+                    </div>
+                    <div class="card-title">Amazon Web Services</div>
+                    <div class="card-stats">
+                        <div class="stat-cell"><div class="stat-value">6</div><div class="stat-label">Accounts</div></div>
+                        <div class="stat-cell"><div class="stat-value">10307</div><div class="stat-label">Resources</div></div>
+                        <div class="stat-cell"><div class="stat-value">$1.12K</div><div class="stat-label">Cost (30 Days)</div></div>
+                        <div class="stat-cell"><div class="stat-value">3004</div><div class="stat-label">Compliance Alerts</div></div>
                     </div>
                 </div>
                 
                 <!-- Azure -->
-                <div class="provider-card azure">
-                    <div class="provider-card-header"><div style="font-size: 24px;">☁️</div></div>
-                    <div class="provider-card-body">
-                        <div class="provider-name">Microsoft Azure</div>
-                        <div class="provider-stats">
-                            <div><div class="stat-value">5</div><div class="stat-label">Subscriptions</div></div>
-                            <div><div class="stat-value">1,078</div><div class="stat-label">Resources</div></div>
-                            <div id="azure-cost"><div class="stat-value">£487.82</div><div class="stat-label">Cost (30 Days)</div></div>
-                            <div><div class="stat-value">173</div><div class="stat-label">Compliance Alerts</div></div>
-                        </div>
+                <div class="mantine-Card-root provider-card azure">
+                    <div class="card-logo">
+                        <svg height="32" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="azure-grad" x1="58.97" y1="9.37" x2="26.99" y2="103.93" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#114a8b"/>
+                                    <stop offset="1" stop-color="#0669bc"/>
+                                </linearGradient>
+                                <linearGradient id="azure-grad2" x1="60.25" y1="52.61" x2="53.03" y2="54.99" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-opacity=".3"/>
+                                    <stop offset=".07" stop-opacity=".2"/>
+                                    <stop offset=".32" stop-opacity=".1"/>
+                                    <stop offset=".62" stop-opacity=".05"/>
+                                    <stop offset="1" stop-opacity="0"/>
+                                </linearGradient>
+                                <linearGradient id="azure-grad3" x1="50.19" y1="6.22" x2="60.75" y2="93.34" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#3ccbf4"/>
+                                    <stop offset="1" stop-color="#2892df"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M33.34 6.27h26.04L32.54 89.12a5.38 5.38 0 01-5.09 3.61H8.85a5.39 5.39 0 01-5.09-7.16L28.25 9.88a5.38 5.38 0 015.09-3.61z" fill="url(#azure-grad)"/>
+                            <path d="M71.17 60.26H29.88a2.47 2.47 0 00-1.69 4.28l26.63 24.91a5.42 5.42 0 003.69 1.46h23.87z" fill="url(#azure-grad2)"/>
+                            <path d="M33.34 6.27a5.35 5.35 0 00-5.1 3.68L3.8 85.53a5.38 5.38 0 005.05 7.2h19.07a5.59 5.59 0 004.6-3.61l5.58-15.56 17.91 16.74a5.47 5.47 0 003.44 1.43h23.78L62.67 60.26l-29.12.02L52.7 6.27z" fill="url(#azure-grad3)"/>
+                        </svg>
+                    </div>
+                    <div class="card-title">Microsoft Azure</div>
+                    <div class="card-stats">
+                        <div class="stat-cell"><div class="stat-value">5</div><div class="stat-label">Subscriptions</div></div>
+                        <div class="stat-cell"><div class="stat-value">1078</div><div class="stat-label">Resources</div></div>
+                        <div class="stat-cell"><div class="stat-value">£487.82</div><div class="stat-label">Cost (30 Days)</div></div>
+                        <div class="stat-cell"><div class="stat-value">173</div><div class="stat-label">Compliance Alerts</div></div>
                     </div>
                 </div>
                 
                 <!-- GCP -->
-                <div class="provider-card gcp">
-                    <div class="provider-card-header"><div style="font-size: 24px;">🔴🟡🟢🔵</div></div>
-                    <div class="provider-card-body">
-                        <div class="provider-name">Google Cloud Platform</div>
-                        <div class="provider-stats">
-                            <div><div class="stat-value">1</div><div class="stat-label">Projects</div></div>
-                            <div><div class="stat-value">190</div><div class="stat-label">Resources</div></div>
-                            <div id="gcp-cost"><div class="stat-value">£91.38</div><div class="stat-label">Cost (30 Days)</div></div>
-                            <div><div class="stat-value">0</div><div class="stat-label">Compliance Alerts</div></div>
-                        </div>
+                <div class="mantine-Card-root provider-card gcp">
+                    <div class="card-logo">
+                        <img src="data:image/webp;base64,UklGRnQGAABXRUJQVlA4WAoAAAAwAAAAHwAAGQAASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZBTFBI2wEAAAmgdm2bIUmWfkdkZI9t27Zt27Zt27ZtW2vbtm0rAx8iq2sjYgJIKKTJO7pTqSz2h5dPXvwnMCQbuEIffL20RhZk7jYn/r5qpEgiNJs/LuqEINZ2cnWcTJWKHp5mAkFCKaOnhluRCqHPN3UB4OIg1IdakJrmvayAiE/mt++65WciUNEDaYME0t7RErSpUHzNnWvTs/cLNYTuhkng+qUoQFV4S0hAnsunNLgWWUWMcgscgP7w7+E2BOu+7apAunFOAErvqICvCA++ESlAXPvZgV3d2wmE3jHRCA8CV/onDVgOCwiic11B1JpoAhLqcAGxzwGE0ZXMgb1mA9B88Abmv3D4Hhnz879EELqrpmw+CVpnL1VJvp0y5Ii0nrg/bedQg2uavieAKvQbyKpTj0uL75A3xiqQ1K3mvf2DAeO2SUtCK444gKqh9ye+xZLayHopH3g1w4CkZdXAe++qZ181yaV9znhPP/avAcro/es3xS5e6s8/+QcB2E++FjMDh5Ry1KzpscuW+KsGWAVW9pVi5zsWECQtwcnLzzqryn2K5X/V4uEeyqFVib0Sl5wjGN081IBW4zJMf/7Lb76O/fkn/+fvnh6eclBG+Jq/t9QpmC9/bPYcfvY8DY4YZwEAVlA4IKICAACwDwCdASogABoAPlEejEQjoaEYBAA4BQS2AE6ZQjgb0D8HeQM2D7Z5MHzYfh/MB/VcQB+lH65ewB1AH6V9YB6CHlleyL+4H7M+yrbADxAaq+1BYt/PNzd/kP+J9gX+Tf07/d/l73RPQd/WAd1/z5Qtd23oDh/XIa8K+5Bxu833ylAon26AAAD+94H7khJS0u56aC+3D3QygJtuz8AM85FyjjIYg5W5e1FwR76h/ZARr0kvj/+lej/zNft5vT4biF+HB1qdvOE0dfH1vW9hBgvznpr8nivqolVHC/1VkFB5b/f8UHJgY/jjcX3kct8bwFW31d8dX3KP2KkWHsNVK4c7nvfrIhyI5jeRv8xCyCL/tey3INflRyxlJEyQVRFgJFCKee2Bni0Ej8h0s4vgPGtSGP/P8Ucg+6jqRzKoOsxyHefkeYPWo+TtY/9C8R/pPgqzrHYa2ZctumB9WqQrnrGdOfACuARo60YT58L0zCbR5G4GmdXZHCkoGeZSIKPho914N7Ww4p3ZeluC2zzkptHFUZdorYPzkk5SA4HExVbbxaxW1nb++tmeIDxfBi5A1RufFB4lQa6Bpo2gN00n+pEZEZHEr+4cF4uG0Mv91Ckpr+tuF3asNUSuL1XoBz+MeqUw5n5qnmeM9Vjc0FfMoyX6s0aQeSFj8ZbdgdH/2wGliHOv6/+Feyv+s7fyBMvZyG+x0vu8Ol24vOf8pbedEazbejxCpoB6QkTlv4lUsjMOVPNTKXB3TMHIa/PojThvJCP1nguSpbBP5T4n/xVM+RTTHhNCRl0QwkB5XLTLrWOuUuWUxn+Q8tcDqwuED/iy5Xf9LLLtFIeM/9SmaE/oHdZOv8YEYcCfEDPm1tyUXOYO7E7AxUwgqLJkFF4uOS1TXAAAAA==" alt="GCP" height="32">
+                    </div>
+                    <div class="card-title">Google Cloud Platform</div>
+                    <div class="card-stats">
+                        <div class="stat-cell"><div class="stat-value">1</div><div class="stat-label">Projects</div></div>
+                        <div class="stat-cell"><div class="stat-value">190</div><div class="stat-label">Resources</div></div>
+                        <div class="stat-cell"><div class="stat-value">£91.38</div><div class="stat-label">Cost (30 Days)</div></div>
+                        <div class="stat-cell"><div class="stat-value">0</div><div class="stat-label">Compliance Alerts</div></div>
                     </div>
                 </div>
                 
-                <!-- Kubernetes -->
-                <div class="provider-card k8s">
-                    <div class="provider-card-header"><div style="font-size: 24px;">⎈</div></div>
-                    <div class="provider-card-body">
-                        <div class="provider-name">Kubernetes</div>
-                        <div class="provider-stats">
-                            <div><div class="stat-value">2</div><div class="stat-label">Clusters</div></div>
-                            <div><div class="stat-value">146</div><div class="stat-label">Resources</div></div>
-                            <div><div class="stat-value"></div><div class="stat-label"></div></div>
-                            <div><div class="stat-value">0</div><div class="stat-label">Compliance Alerts</div></div>
-                        </div>
+                <!-- K8s -->
+                <div class="mantine-Card-root provider-card k8s">
+                    <div class="card-logo">
+                        <svg height="32" viewBox="0 0 722 702" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M358.986 0a43.673 43.673 0 00-17.902 4.241L73.522 131.013a43.673 43.673 0 00-23.481 30.992L1.066 446.625a43.673 43.673 0 007.29 33.313l183.214 233.96a43.673 43.673 0 0034.6 16.002h269.648a43.673 43.673 0 0034.6-16.002l183.214-233.96a43.673 43.673 0 007.29-33.313l-48.975-284.62a43.673 43.673 0 00-23.481-30.992L380.904 4.241A43.673 43.673 0 00358.986 0z" fill="#326ce5"/>
+                            <path d="M359.385 127.752c-8.912.048-16.259 7.102-16.704 16.014-.012.143-.02.286-.024.43l-.045 6.656c-.066 9.058-6.723 16.665-15.64 18.197a186.39 186.39 0 00-22.618 5.2c-8.627 2.585-17.984-.976-22.556-8.59l-3.542-5.847c-4.833-8.054-15.136-10.758-23.31-6.128-8.174 4.63-11.18 14.85-6.81 23.153l.033.06 3.397 5.923c4.466 7.672 3.054 17.33-3.397 23.284a185.473 185.473 0 00-16.503 18.26c-5.675 7.25-15.386 9.452-23.413 5.308l-5.93-3.166c-8.225-4.488-18.487-1.527-23.232 6.556-4.745 8.082-2.09 18.431 5.856 23.422l.067.04 5.797 3.57c7.8 4.678 11.174 14.027 8.15 22.56a185.11 185.11 0 00-4.772 22.727c-1.504 9.127-9.212 15.89-18.416 15.959l-6.63.024c-9.325.156-16.77 7.851-16.615 17.176.155 9.325 7.85 16.77 17.175 16.615h.03l6.656-.045c9.142-.071 16.844 6.523 18.425 15.618a185.107 185.107 0 005.2 22.618c2.614 8.72-.99 18.16-8.693 22.76l-5.748 3.44c-8.103 4.802-10.871 15.087-6.28 23.299 4.592 8.212 14.787 11.192 23.1 6.807l.067-.033 5.923-3.398c7.752-4.531 17.509-3.062 23.487 3.538a185.12 185.12 0 0018.057 16.3c7.404 5.677 9.665 15.571 5.434 23.716l-3.166 5.93c-4.613 8.153-1.822 18.447 6.262 23.18 8.084 4.735 18.428 2.072 23.414-5.863l.033-.059 3.572-5.799c4.636-7.843 13.999-11.29 22.584-8.32a185.472 185.472 0 0022.525 5.308c9.017 1.543 15.607 9.29 15.54 18.265l-.023 6.632c.034 9.32 7.612 16.833 16.931 16.799 9.32-.034 16.834-7.611 16.8-16.931l.044-6.657c.06-9.136 6.688-16.821 15.794-18.325a185.44 185.44 0 0022.727-4.772c8.612-2.566 17.95.968 22.56 8.555l3.542 5.847c4.833 8.054 15.136 10.758 23.31 6.128s11.18-14.85 6.81-23.152l-.033-.06-3.398-5.923c-4.492-7.717-3.07-17.432 3.44-23.386a186.014 186.014 0 0016.3-18.058c5.747-7.344 15.597-9.553 23.716-5.332l5.93 3.166c8.225 4.489 18.488 1.527 23.233-6.555 4.744-8.083 2.09-18.432-5.856-23.423l-.067-.04-5.799-3.57c-7.843-4.637-11.29-14-8.32-22.585a185.113 185.113 0 004.772-22.727c1.571-9.127 9.315-15.843 18.518-15.861h6.53c9.325-.172 16.756-7.88 16.584-17.205-.172-9.325-7.88-16.757-17.205-16.585l-6.656.046c-9.058.066-16.665-6.724-18.197-15.64a186.036 186.036 0 00-5.2-22.618c-2.585-8.628.976-17.985 8.59-22.557l5.848-3.541c8.082-4.78 10.85-15.093 6.236-23.28-4.614-8.19-14.886-11.151-23.18-6.721l-5.821 3.296c-7.758 4.543-17.526 3.075-23.512-3.54a186.006 186.006 0 00-18.058-16.3c-7.254-5.564-9.537-15.276-5.409-23.284l3.265-6.132c4.595-8.08 1.824-18.355-6.22-23.066-8.043-4.71-18.363-2.066-23.2 5.926l-.058.098-3.57 5.798c-4.678 7.8-14.027 11.175-22.56 8.15a185.102 185.102 0 00-22.727-4.771c-9.015-1.535-15.62-9.175-15.64-18.165l-.023-6.631c.056-4.504-1.685-8.843-4.838-12.053-3.154-3.21-7.46-5.031-11.965-5.061zm-2.148 141.48a8.05 8.05 0 01.608.006l36.986 2.013c6.094.364 11.166 4.826 12.314 10.828l7.546 39.29a125.966 125.966 0 0127.368 16.082l36.76-14.728c5.737-2.259 12.23.124 15.36 5.35l19.405 32.627c3.09 5.173 2.225 11.742-2.051 15.658l-28.027 25.83a127.39 127.39 0 013.115 31.448l30.706 22.963c4.832 3.57 6.328 10.168 3.611 15.612l-16.733 34.243c-2.691 5.459-8.922 8.158-14.7 6.385l-38.127-11.82a126.086 126.086 0 01-22.01 22.01l11.82 38.127c1.806 5.694-.88 11.877-6.233 14.6l-34.344 16.833c-5.444 2.717-12.041 1.22-15.612-3.611l-22.963-30.706a126.92 126.92 0 01-31.448-3.116l-25.829 28.028c-4.05 4.392-10.654 5.194-15.659 2.05l-32.627-19.404c-5.226-3.13-7.608-9.623-5.35-15.36l14.728-36.76a126.024 126.024 0 01-16.082-27.368l-39.29-7.546c-6.003-1.149-10.465-6.22-10.829-12.314l-2.112-36.986c-.356-6.136 3.463-11.752 9.236-13.647l36.79-11.97a127.12 127.12 0 017.546-29.838l-23.54-30.3c-3.746-4.794-3.603-11.538.391-16.167l25.625-29.682c3.963-4.604 10.676-5.793 15.988-2.842l34.192 19.128a126.14 126.14 0 0125.5-16.94l5.57-39.01c.917-6.008 5.807-10.64 11.845-11.248l2.612-.263a8.05 8.05 0 012.045-.07zm2.35 107.16c-44.67 0-80.903 36.233-80.903 80.903 0 44.67 36.233 80.904 80.903 80.904s80.904-36.233 80.904-80.904c0-44.67-36.233-80.903-80.904-80.903z" fill="#fff"/>
+                        </svg>
+                    </div>
+                    <div class="card-title">Kubernetes</div>
+                    <div class="card-stats k8s-stats">
+                        <div class="stat-cell"><div class="stat-value">2</div><div class="stat-label">Clusters</div></div>
+                        <div class="stat-cell"><div class="stat-value">146</div><div class="stat-label">Resources</div></div>
+                        <div class="stat-cell k8s-full-width"><div class="stat-value">0</div><div class="stat-label">Compliance Alerts</div></div>
                     </div>
                 </div>
             </div>
             
-            <!-- Charts Section -->
-            <div class="charts-section">
-                <!-- Cloud Provider Spend -->
+            <!-- Charts -->
+            <div class="charts-row">
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3 class="chart-title">Cloud Provider Spend</h3>
-                        <div class="chart-toggles">
-                            <div class="chart-toggle-group" style="margin-right: 8px;">
-                                <button class="chart-toggle-btn unblended active" onclick="setCostType('unblended')">Unblended</button>
-                                <button class="chart-toggle-btn amortized" onclick="setCostType('amortized')">Amortized</button>
-                                <button class="chart-toggle-btn both" onclick="setCostType('both')">Both</button>
+                        <span class="chart-title">Cloud Provider Spend</span>
+                        <div class="chart-controls">
+                            <div class="mantine-SegmentedControl-root cost-type-toggle">
+                                <button class="mantine-SegmentedControl-control" data-active="true" onclick="setCostType('unblended')">Unblended</button>
+                                <button class="mantine-SegmentedControl-control" data-active="false" onclick="setCostType('amortized')">Amortized</button>
+                                <button class="mantine-SegmentedControl-control" data-active="false" onclick="setCostType('both')">Both</button>
                             </div>
-                            <div class="chart-toggle-group">
-                                <button class="chart-toggle-btn time" onclick="setTimeRange('Day')">Day</button>
-                                <button class="chart-toggle-btn time" onclick="setTimeRange('Week')">Week</button>
-                                <button class="chart-toggle-btn time active" onclick="setTimeRange('Month')">Month</button>
+                            <div class="mantine-SegmentedControl-root">
+                                <button class="mantine-SegmentedControl-control" data-active="false" onclick="setTimeRange('Day')">Day</button>
+                                <button class="mantine-SegmentedControl-control" data-active="false" onclick="setTimeRange('Week')">Week</button>
+                                <button class="mantine-SegmentedControl-control" data-active="true" onclick="setTimeRange('Month')">Month</button>
                             </div>
                         </div>
-                    </div>
-                    <div class="legend" id="spend-legend">
-                        <div class="legend-item"><div class="legend-color" style="background: #fbbf24;"></div>Amazon</div>
-                        <div class="legend-item"><div class="legend-line" style="background: #fbbf24;"></div>Amazon trendline</div>
-                        <div class="legend-item"><div class="legend-color" style="background: #22c55e;"></div>GCP</div>
-                        <div class="legend-item"><div class="legend-line" style="background: #22c55e;"></div>GCP trendline</div>
-                        <div class="legend-item"><div class="legend-color" style="background: #3b82f6;"></div>Azure</div>
-                        <div class="legend-item"><div class="legend-line" style="background: #3b82f6;"></div>Azure trendline</div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="spendChart"></canvas>
-                    </div>
-                </div>
-                
-                <!-- Compliance History -->
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3 class="chart-title">Compliance History</h3>
                     </div>
                     <div class="legend">
-                        <div class="legend-item"><div class="legend-color" style="background: #fef08a;"></div>Low Priority</div>
-                        <div class="legend-item"><div class="legend-color" style="background: #fb923c;"></div>Medium Priority</div>
-                        <div class="legend-item"><div class="legend-color" style="background: #ef4444;"></div>High Priority</div>
-                        <div class="legend-item"><div class="legend-line" style="background: #1e2a3b;"></div>Compliance Score</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#f69827"></div>Amazon</div>
+                        <div class="legend-item"><div class="legend-line" style="background:#f69827"></div>Amazon trendline</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#69ba6b"></div>GCP</div>
+                        <div class="legend-item"><div class="legend-line" style="background:#69ba6b"></div>GCP trendline</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#0078d4"></div>Azure</div>
+                        <div class="legend-item"><div class="legend-line" style="background:#0078d4"></div>Azure trendline</div>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="complianceChart"></canvas>
+                    <div class="chart-container"><canvas id="spendChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header"><span class="chart-title">Compliance History</span></div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot" style="background:#f7df57"></div>Low Priority</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#f69827"></div>Medium Priority</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#c20114"></div>High Priority</div>
+                        <div class="legend-item"><div class="legend-line" style="background:#333"></div>Compliance Score</div>
                     </div>
+                    <div class="chart-container"><canvas id="complianceChart"></canvas></div>
                 </div>
             </div>
             
-            <!-- Definitions -->
-            <div class="definitions">
-                <h4>Cost Type Definitions</h4>
-                <div class="definitions-grid">
-                    <div class="definition">
-                        <h5 class="blue">Unblended Cost</h5>
-                        <p>Actual charges incurred at the time of usage. Shows raw pay-as-you-go costs without any adjustments for reserved capacity or savings plans.</p>
+            <!-- Cost Explanation Section -->
+            <div class="cost-explanation">
+                <div class="explanation-card">
+                    <div class="explanation-header">
+                        <span class="explanation-icon">💡</span>
+                        <span class="explanation-title">Understanding Cost Types</span>
                     </div>
-                    <div class="definition">
-                        <h5 class="purple">Amortized Cost</h5>
-                        <p>Spreads upfront costs (Reserved Instances, Savings Plans) over the billing period. Better reflects the true cost of resources over time.</p>
-                    </div>
-                    <div class="definition">
-                        <h5 class="orange">Both View</h5>
-                        <p>Displays both cost types side by side for comparison. Helps identify the impact of amortization on your cloud spending patterns.</p>
+                    <div class="explanation-content">
+                        <div class="explanation-item">
+                            <h4>Unblended Cost</h4>
+                            <p>Actual charges incurred at the time of usage. Shows raw pay-as-you-go costs without any adjustments for reserved capacity or savings plans.</p>
+                        </div>
+                        <div class="explanation-item">
+                            <h4>Amortized Cost</h4>
+                            <p>Spreads upfront costs (Reserved Instances, Savings Plans) over the billing period. Better reflects the true cost of resources over time.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -342,414 +1372,147 @@
     </div>
     
     <script>
-        // Data for different time ranges
-        const timeRangeData = {
-            Month: {
-                labels: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                amazon: [80, 120, 150, 200, 250, 320, 380, 450, 520, 600, 680, 780, 900],
-                gcp: [20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110, 75, 85],
-                azure: [30, 40, 50, 60, 75, 90, 105, 120, 140, 160, 180, 200, 220],
-                amazonTrend: [90, 130, 170, 220, 280, 350, 420, 500, 580, 660, 750, 850, 950],
-                gcpTrend: [25, 30, 38, 48, 60, 75, 88, 100, 115, 130, 145, 160, 175],
-                azureTrend: [35, 45, 58, 72, 90, 108, 126, 144, 168, 192, 216, 240, 264]
-            },
-            Week: {
-                labels: ['W1 Nov', 'W2 Nov', 'W3 Nov', 'W4 Nov', 'W1 Dec', 'W2 Dec'],
-                amazon: [180, 195, 210, 205, 225, 240],
-                gcp: [18, 20, 22, 19, 21, 24],
-                azure: [48, 52, 55, 50, 54, 58],
-                amazonTrend: [175, 190, 205, 215, 230, 245],
-                gcpTrend: [17, 19, 21, 20, 22, 25],
-                azureTrend: [46, 50, 53, 52, 56, 60]
-            },
-            Day: {
-                labels: ['Dec 9', 'Dec 10', 'Dec 11', 'Dec 12', 'Dec 13', 'Dec 14', 'Dec 15'],
-                amazon: [28, 32, 30, 35, 33, 38, 36],
-                gcp: [2.8, 3.2, 3.0, 3.5, 3.3, 3.8, 3.6],
-                azure: [7.5, 8.2, 7.8, 8.5, 8.0, 9.0, 8.8],
-                amazonTrend: [29, 31, 32, 33, 34, 36, 37],
-                gcpTrend: [2.9, 3.1, 3.2, 3.3, 3.4, 3.6, 3.7],
-                azureTrend: [7.8, 8.0, 8.2, 8.4, 8.6, 8.8, 9.0]
-            }
+        // Unblended data
+        const unblendedData = {
+            Month: { labels: ['Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], amazon: [80,120,150,200,250,320,380,450,520,600,680,780,900], gcp: [20,25,30,40,50,60,70,80,90,100,110,75,85], azure: [30,40,50,60,75,90,105,120,140,160,180,200,220], amazonTrend: [90,130,170,220,280,350,420,500,580,660,750,850,950], gcpTrend: [25,30,38,48,60,75,88,100,115,130,145,160,175], azureTrend: [35,45,58,72,90,108,126,144,168,192,216,240,264] },
+            Week: { labels: ['W1 Nov','W2 Nov','W3 Nov','W4 Nov','W1 Dec','W2 Dec'], amazon: [180,195,210,205,225,240], gcp: [18,20,22,19,21,24], azure: [48,52,55,50,54,58], amazonTrend: [175,190,205,215,230,245], gcpTrend: [17,19,21,20,22,25], azureTrend: [46,50,53,52,56,60] },
+            Day: { labels: ['Dec 9','Dec 10','Dec 11','Dec 12','Dec 13','Dec 14','Dec 15'], amazon: [28,32,30,35,33,38,36], gcp: [2.8,3.2,3.0,3.5,3.3,3.8,3.6], azure: [7.5,8.2,7.8,8.5,8.0,9.0,8.8], amazonTrend: [29,31,32,33,34,36,37], gcpTrend: [2.9,3.1,3.2,3.3,3.4,3.6,3.7], azureTrend: [7.8,8.0,8.2,8.4,8.6,8.8,9.0] }
         };
-        
-        // Y-axis max values for different time ranges
-        const yAxisMax = {
-            Month: { left: 1400, right: 400 },
-            Week: { left: 300, right: 80 },
-            Day: { left: 50, right: 15 }
+        // Amortized data (slightly different values)
+        const amortizedData = {
+            Month: { labels: ['Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], amazon: [75,115,140,185,235,300,360,425,490,565,645,740,855], gcp: [18,23,28,37,46,55,65,74,83,92,102,70,79], azure: [28,37,47,56,70,84,98,112,131,150,169,188,207], amazonTrend: [85,125,160,205,265,330,395,470,545,620,705,800,895], gcpTrend: [23,28,35,45,56,70,82,93,107,121,135,149,163], azureTrend: [32,42,54,67,84,101,118,135,157,180,203,225,248] },
+            Week: { labels: ['W1 Nov','W2 Nov','W3 Nov','W4 Nov','W1 Dec','W2 Dec'], amazon: [170,185,200,195,215,230], gcp: [17,19,21,18,20,23], azure: [45,49,52,47,51,55], amazonTrend: [165,180,195,205,220,235], gcpTrend: [16,18,20,19,21,24], azureTrend: [43,47,50,49,53,57] },
+            Day: { labels: ['Dec 9','Dec 10','Dec 11','Dec 12','Dec 13','Dec 14','Dec 15'], amazon: [26,30,28,33,31,36,34], gcp: [2.6,3.0,2.8,3.3,3.1,3.6,3.4], azure: [7.0,7.7,7.3,8.0,7.5,8.5,8.3], amazonTrend: [27,29,30,31,32,34,35], gcpTrend: [2.7,2.9,3.0,3.1,3.2,3.4,3.5], azureTrend: [7.3,7.5,7.7,7.9,8.1,8.3,8.5] }
         };
+        // KPI values
+        const kpiUnblended = { aws: '$1.12K', azure: '£487.82', gcp: '£91.38' };
+        const kpiAmortized = { aws: '$1.05K', azure: '£458.25', gcp: '£85.72' };
         
-        const complianceDates = ['Jun 15', 'Jun 25', 'Jul 5', 'Jul 15', 'Jul 28', 'Aug 10', 'Aug 25', 'Sep 9', 'Sep 24', 'Oct 11', 'Oct 29', 'Nov 13', 'Nov 28', 'Dec 13'];
-        const highPriority = [120, 118, 125, 118, 120, 135, 145, 160, 175, 170, 155, 140, 125, 110];
-        const mediumPriority = [35, 40, 36, 32, 32, 40, 44, 47, 50, 53, 56, 59, 62, 65];
-        const lowPriority = [45, 40, 44, 48, 48, 40, 36, 33, 30, 27, 24, 21, 18, 15];
-        const complianceScore = [52, 53, 50, 53, 53, 47, 43, 38, 32, 34, 40, 46, 52, 58];
+        const yAxisMax = { Month: { left: 1200, right: 400 }, Week: { left: 300, right: 80 }, Day: { left: 50, right: 15 } };
+        let currentTimeRange = 'Month', spendChart, complianceChart;
+        let currentCostType = 'unblended'; // 'unblended', 'amortized', or 'both'
+        let currentKpiCostType = 'unblended';
         
-        // Provider costs
-        const providerCosts = {
-            aws: { unblended: 1120, amortized: 1254 },
-            azure: { unblended: 487.82, amortized: 526.85 },
-            gcp: { unblended: 91.38, amortized: 95.95 }
-        };
+        function formatNumber(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
         
-        let currentCostType = 'unblended';
-        let currentTimeRange = 'Month';
-        let spendChart, complianceChart;
-        
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-        
-        function formatCost(value, currency = '$') {
-            if (value >= 1000) return currency + formatNumber((value / 1000).toFixed(2)) + 'K';
-            return currency + formatNumber(value.toFixed(2));
+        function setTimeRange(r) { 
+            currentTimeRange = r; 
+            // Only update time range buttons (not cost type buttons)
+            document.querySelectorAll('.mantine-SegmentedControl-root:not(.cost-type-toggle) .mantine-SegmentedControl-control').forEach(b => { 
+                b.setAttribute('data-active', b.textContent === r ? 'true' : 'false'); 
+            }); 
+            updateChart(); 
         }
         
         function setCostType(type) {
             currentCostType = type;
-            updateUI();
-        }
-        
-        function setTimeRange(range) {
-            currentTimeRange = range;
-            // Update time toggle buttons
-            document.querySelectorAll('.chart-toggle-btn.time').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.textContent === range) btn.classList.add('active');
+            // Update chart cost type buttons
+            document.querySelectorAll('.chart-controls .cost-type-toggle .mantine-SegmentedControl-control').forEach(b => {
+                const btnType = b.textContent.toLowerCase();
+                b.setAttribute('data-active', btnType === type ? 'true' : 'false');
             });
-            // Update the chart with new time range data
-            updateSpendChart();
+            updateChart();
         }
         
-        function updateUI() {
-            // Update toggle buttons
-            document.querySelectorAll('.toggle-btn, .chart-toggle-btn').forEach(btn => {
-                if (btn.classList.contains('unblended') || btn.classList.contains('amortized') || btn.classList.contains('both')) {
-                    btn.classList.remove('active');
-                    if (btn.classList.contains(currentCostType)) btn.classList.add('active');
-                }
+        function setKpiCostType(type) {
+            currentKpiCostType = type;
+            // Update KPI cost type buttons
+            document.querySelectorAll('.kpi-toggle .cost-type-toggle .mantine-SegmentedControl-control').forEach(b => {
+                const btnType = b.textContent.toLowerCase();
+                b.setAttribute('data-active', btnType === type ? 'true' : 'false');
             });
-            
-            // Update label
-            const label = document.getElementById('toggleValueLabel');
-            label.textContent = currentCostType === 'both' ? 'Comparing Both' : currentCostType.charAt(0).toUpperCase() + currentCostType.slice(1);
-            label.style.color = currentCostType === 'unblended' ? '#fbbf24' : currentCostType === 'amortized' ? '#f97316' : '#6366f1';
-            
-            // Update provider costs
-            updateProviderCosts();
-            
-            // Update chart
-            updateSpendChart();
-            
-            // Update legend
-            updateLegend();
+            updateKpiValues();
         }
         
-        function updateProviderCosts() {
-            const providers = ['aws', 'azure', 'gcp'];
-            const currencies = { aws: '$', azure: '£', gcp: '£' };
+        function updateKpiValues() {
+            const awsCard = document.querySelector('.provider-card.aws');
+            const azureCard = document.querySelector('.provider-card.azure');
+            const gcpCard = document.querySelector('.provider-card.gcp');
             
-            providers.forEach(provider => {
-                const el = document.getElementById(provider + '-cost');
-                const costs = providerCosts[provider];
-                const currency = currencies[provider];
-                
-                if (currentCostType === 'both') {
-                    el.innerHTML = `
-                        <div class="stat-dual">
-                            <div class="stat-primary">${formatCost(costs.unblended, currency)}</div>
-                            <div class="stat-secondary">${formatCost(costs.amortized, currency)}</div>
-                            <div class="stat-label">Unbl. / Amort.</div>
-                        </div>
-                    `;
-                } else {
-                    const value = currentCostType === 'amortized' ? costs.amortized : costs.unblended;
-                    const colorClass = currentCostType === 'amortized' ? ' amortized-color' : '';
-                    el.innerHTML = `
-                        <div class="stat-value${colorClass}">${formatCost(value, currency)}</div>
-                        <div class="stat-label">Cost (30 Days)</div>
-                    `;
-                }
-            });
-        }
-        
-        function updateLegend() {
-            const legend = document.getElementById('spend-legend');
-            if (currentCostType === 'both') {
-                legend.innerHTML = `
-                    <div class="legend-item"><div class="legend-color" style="background: #fbbf24;"></div>Amazon (Unblended)</div>
-                    <div class="legend-item"><div class="legend-line" style="background: #fbbf24;"></div>Unblended trendline</div>
-                    <div class="legend-item"><div class="legend-color" style="background: #f97316;"></div>Amazon (Amortized)</div>
-                    <div class="legend-item"><div class="legend-line" style="background: #f97316;"></div>Amortized trendline</div>
-                    <div class="legend-item"><div class="legend-color" style="background: #22c55e;"></div>GCP</div>
-                    <div class="legend-item"><div class="legend-line" style="background: #22c55e;"></div>GCP trendline</div>
-                    <div class="legend-item"><div class="legend-color" style="background: #3b82f6;"></div>Azure</div>
-                    <div class="legend-item"><div class="legend-line" style="background: #3b82f6;"></div>Azure trendline</div>
-                `;
-            } else {
-                legend.innerHTML = `
-                    <div class="legend-item"><div class="legend-color" style="background: #fbbf24;"></div>Amazon</div>
-                    <div class="legend-item"><div class="legend-line" style="background: #fbbf24;"></div>Amazon trendline</div>
-                    <div class="legend-item"><div class="legend-color" style="background: #22c55e;"></div>GCP</div>
-                    <div class="legend-item"><div class="legend-line" style="background: #22c55e;"></div>GCP trendline</div>
-                    <div class="legend-item"><div class="legend-color" style="background: #3b82f6;"></div>Azure</div>
-                    <div class="legend-item"><div class="legend-line" style="background: #3b82f6;"></div>Azure trendline</div>
-                `;
+            if (currentKpiCostType === 'unblended') {
+                if (awsCard) awsCard.querySelectorAll('.stat-value')[2].textContent = kpiUnblended.aws;
+                if (azureCard) azureCard.querySelectorAll('.stat-value')[2].textContent = kpiUnblended.azure;
+                if (gcpCard) gcpCard.querySelectorAll('.stat-value')[2].textContent = kpiUnblended.gcp;
+            } else if (currentKpiCostType === 'amortized') {
+                if (awsCard) awsCard.querySelectorAll('.stat-value')[2].textContent = kpiAmortized.aws;
+                if (azureCard) azureCard.querySelectorAll('.stat-value')[2].textContent = kpiAmortized.azure;
+                if (gcpCard) gcpCard.querySelectorAll('.stat-value')[2].textContent = kpiAmortized.gcp;
+            } else { // both
+                if (awsCard) awsCard.querySelectorAll('.stat-value')[2].innerHTML = kpiUnblended.aws + '<br><span style="font-size:0.7em;color:#666">(' + kpiAmortized.aws + ' amort.)</span>';
+                if (azureCard) azureCard.querySelectorAll('.stat-value')[2].innerHTML = kpiUnblended.azure + '<br><span style="font-size:0.7em;color:#666">(' + kpiAmortized.azure + ' amort.)</span>';
+                if (gcpCard) gcpCard.querySelectorAll('.stat-value')[2].innerHTML = kpiUnblended.gcp + '<br><span style="font-size:0.7em;color:#666">(' + kpiAmortized.gcp + ' amort.)</span>';
             }
         }
         
-        function updateSpendChart() {
-            const data = timeRangeData[currentTimeRange];
-            const multiplier = currentCostType === 'amortized' ? 1.12 : 1;
-            const amazonValues = data.amazon.map(v => v * multiplier);
-            const amazonTrendValues = data.amazonTrend.map(v => v * multiplier);
+        function updateChart() {
+            const d = unblendedData[currentTimeRange];
+            const da = amortizedData[currentTimeRange];
+            let datasets = [];
             
-            const datasets = [];
-            
-            if (currentCostType === 'both') {
-                datasets.push({
-                    label: 'Amazon (Unblended)',
-                    data: data.amazon,
-                    backgroundColor: '#fbbf24',
-                    borderRadius: 2,
-                    barPercentage: 0.6,
-                    categoryPercentage: 0.7,
-                    order: 3
-                });
-                datasets.push({
-                    label: 'Amazon (Amortized)',
-                    data: data.amazon.map(v => v * 1.12),
-                    backgroundColor: '#f97316',
-                    borderRadius: 2,
-                    barPercentage: 0.6,
-                    categoryPercentage: 0.7,
-                    order: 3
-                });
-            } else {
-                datasets.push({
-                    label: 'Amazon',
-                    data: amazonValues,
-                    backgroundColor: '#fbbf24',
-                    borderRadius: 2,
-                    barPercentage: 0.6,
-                    categoryPercentage: 0.8,
-                    order: 3
-                });
+            if (currentCostType === 'unblended') {
+                datasets = [
+                    { label:'Amazon', data:d.amazon, backgroundColor:'#f69827', borderRadius:2, barPercentage:0.5, order:3 },
+                    { label:'GCP', data:d.gcp, backgroundColor:'#69ba6b', borderRadius:2, barPercentage:0.5, order:3 },
+                    { label:'Azure', data:d.azure, backgroundColor:'#0078d4', borderRadius:2, barPercentage:0.5, yAxisID:'y1', order:3 },
+                    { label:'Amazon Trend', data:d.amazonTrend, type:'line', borderColor:'#f69827', borderWidth:2, borderDash:[4,4], pointRadius:0, fill:false, order:1 },
+                    { label:'GCP Trend', data:d.gcpTrend, type:'line', borderColor:'#69ba6b', borderWidth:2, borderDash:[4,4], pointRadius:0, fill:false, order:1 },
+                    { label:'Azure Trend', data:d.azureTrend, type:'line', borderColor:'#0078d4', borderWidth:2, borderDash:[4,4], pointRadius:0, fill:false, yAxisID:'y1', order:1 }
+                ];
+            } else if (currentCostType === 'amortized') {
+                datasets = [
+                    { label:'Amazon', data:da.amazon, backgroundColor:'#f69827', borderRadius:2, barPercentage:0.5, order:3 },
+                    { label:'GCP', data:da.gcp, backgroundColor:'#69ba6b', borderRadius:2, barPercentage:0.5, order:3 },
+                    { label:'Azure', data:da.azure, backgroundColor:'#0078d4', borderRadius:2, barPercentage:0.5, yAxisID:'y1', order:3 },
+                    { label:'Amazon Trend', data:da.amazonTrend, type:'line', borderColor:'#f69827', borderWidth:2, borderDash:[4,4], pointRadius:0, fill:false, order:1 },
+                    { label:'GCP Trend', data:da.gcpTrend, type:'line', borderColor:'#69ba6b', borderWidth:2, borderDash:[4,4], pointRadius:0, fill:false, order:1 },
+                    { label:'Azure Trend', data:da.azureTrend, type:'line', borderColor:'#0078d4', borderWidth:2, borderDash:[4,4], pointRadius:0, fill:false, yAxisID:'y1', order:1 }
+                ];
+            } else { // both - show unblended as solid bars, amortized as pattern/lighter
+                datasets = [
+                    { label:'Amazon (Unblended)', data:d.amazon, backgroundColor:'#f69827', borderRadius:2, barPercentage:0.35, order:3 },
+                    { label:'Amazon (Amortized)', data:da.amazon, backgroundColor:'rgba(246,152,39,0.5)', borderRadius:2, barPercentage:0.35, order:3 },
+                    { label:'GCP (Unblended)', data:d.gcp, backgroundColor:'#69ba6b', borderRadius:2, barPercentage:0.35, order:3 },
+                    { label:'GCP (Amortized)', data:da.gcp, backgroundColor:'rgba(105,186,107,0.5)', borderRadius:2, barPercentage:0.35, order:3 },
+                    { label:'Azure (Unblended)', data:d.azure, backgroundColor:'#0078d4', borderRadius:2, barPercentage:0.35, yAxisID:'y1', order:3 },
+                    { label:'Azure (Amortized)', data:da.azure, backgroundColor:'rgba(0,120,212,0.5)', borderRadius:2, barPercentage:0.35, yAxisID:'y1', order:3 },
+                    { label:'Amazon Trend', data:d.amazonTrend, type:'line', borderColor:'#f69827', borderWidth:2, borderDash:[4,4], pointRadius:0, fill:false, order:1 },
+                    { label:'GCP Trend', data:d.gcpTrend, type:'line', borderColor:'#69ba6b', borderWidth:2, borderDash:[4,4], pointRadius:0, fill:false, order:1 },
+                    { label:'Azure Trend', data:d.azureTrend, type:'line', borderColor:'#0078d4', borderWidth:2, borderDash:[4,4], pointRadius:0, fill:false, yAxisID:'y1', order:1 }
+                ];
             }
             
-            datasets.push({
-                label: 'GCP',
-                data: data.gcp,
-                backgroundColor: '#22c55e',
-                borderRadius: 2,
-                barPercentage: 0.6,
-                categoryPercentage: 0.8,
-                order: 3
-            });
-            
-            datasets.push({
-                label: 'Azure',
-                data: data.azure,
-                backgroundColor: '#3b82f6',
-                borderRadius: 2,
-                barPercentage: 0.6,
-                categoryPercentage: 0.8,
-                yAxisID: 'y1',
-                order: 3
-            });
-            
-            // Trendlines
-            if (currentCostType === 'both') {
-                datasets.push({
-                    label: 'Unblended Trend',
-                    data: data.amazonTrend,
-                    type: 'line',
-                    borderColor: '#fbbf24',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    fill: false,
-                    order: 1
-                });
-                datasets.push({
-                    label: 'Amortized Trend',
-                    data: data.amazonTrend.map(v => v * 1.12),
-                    type: 'line',
-                    borderColor: '#f97316',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    fill: false,
-                    order: 1
-                });
-            } else {
-                datasets.push({
-                    label: 'Amazon Trend',
-                    data: amazonTrendValues,
-                    type: 'line',
-                    borderColor: '#fbbf24',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    fill: false,
-                    order: 1
-                });
-            }
-            
-            datasets.push({
-                label: 'GCP Trend',
-                data: data.gcpTrend,
-                type: 'line',
-                borderColor: '#22c55e',
-                borderWidth: 2,
-                borderDash: [5, 5],
-                pointRadius: 0,
-                fill: false,
-                order: 1
-            });
-            
-            datasets.push({
-                label: 'Azure Trend',
-                data: data.azureTrend,
-                type: 'line',
-                borderColor: '#3b82f6',
-                borderWidth: 2,
-                borderDash: [5, 5],
-                pointRadius: 0,
-                fill: false,
-                yAxisID: 'y1',
-                order: 1
-            });
-            
-            // Update labels and datasets
-            spendChart.data.labels = data.labels;
+            spendChart.data.labels = d.labels;
             spendChart.data.datasets = datasets;
-            
-            // Update Y-axis scales based on time range
-            const maxValues = yAxisMax[currentTimeRange];
-            spendChart.options.scales.y.max = maxValues.left;
-            spendChart.options.scales.y1.max = maxValues.right;
-            
+            spendChart.options.scales.y.max = yAxisMax[currentTimeRange].left;
+            spendChart.options.scales.y1.max = yAxisMax[currentTimeRange].right;
             spendChart.update();
         }
         
-        // Initialize charts
-        function initCharts() {
-            // Spend Chart
-            const spendCtx = document.getElementById('spendChart').getContext('2d');
-            spendChart = new Chart(spendCtx, {
-                type: 'bar',
-                data: {
-                    labels: timeRangeData[currentTimeRange].labels,
-                    datasets: []
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': $' + formatNumber(Math.round(context.raw * 100) / 100);
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: { grid: { display: false } },
-                        y: {
-                            beginAtZero: true,
-                            max: yAxisMax[currentTimeRange].left,
-                            grid: { color: '#f1f5f9' },
-                            ticks: {
-                                callback: function(value) { return '$' + formatNumber(value); }
-                            }
-                        },
-                        y1: {
-                            position: 'right',
-                            beginAtZero: true,
-                            max: yAxisMax[currentTimeRange].right,
-                            grid: { display: false },
-                            ticks: {
-                                callback: function(value) { return '£' + formatNumber(value); }
-                            }
-                        }
-                    }
+        function init() {
+            Chart.defaults.font.family = "'Poppins', sans-serif";
+            spendChart = new Chart(document.getElementById('spendChart'), {
+                type:'bar', data:{labels:[],datasets:[]},
+                options:{ responsive:true, maintainAspectRatio:false, interaction:{intersect:false,mode:'index'}, plugins:{legend:{display:false}},
+                    scales:{ x:{grid:{display:false},ticks:{color:'#888',font:{size:11}}}, y:{beginAtZero:true,max:1200,grid:{color:'#f0f0f0'},ticks:{color:'#888',font:{size:11},callback:v=>'$'+formatNumber(v)}}, y1:{position:'right',beginAtZero:true,max:400,grid:{display:false},ticks:{color:'#888',font:{size:11},callback:v=>'£'+formatNumber(v)}} }
                 }
             });
-            
-            // Compliance Chart
-            const complianceCtx = document.getElementById('complianceChart').getContext('2d');
-            complianceChart = new Chart(complianceCtx, {
-                type: 'bar',
-                data: {
-                    labels: complianceDates,
-                    datasets: [
-                        {
-                            label: 'High Priority',
-                            data: highPriority,
-                            backgroundColor: '#ef4444',
-                            stack: 'stack1'
-                        },
-                        {
-                            label: 'Medium Priority',
-                            data: mediumPriority,
-                            backgroundColor: '#fb923c',
-                            stack: 'stack1'
-                        },
-                        {
-                            label: 'Low Priority',
-                            data: lowPriority,
-                            backgroundColor: '#fef08a',
-                            stack: 'stack1'
-                        },
-                        {
-                            label: 'Compliance Score',
-                            data: complianceScore,
-                            type: 'line',
-                            borderColor: '#1e2a3b',
-                            borderWidth: 2,
-                            pointRadius: 0,
-                            fill: false,
-                            yAxisID: 'y1'
-                        }
+            complianceChart = new Chart(document.getElementById('complianceChart'), {
+                type:'bar',
+                data:{ labels:['Jun 15','Jun 25','Jul 5','Jul 15','Jul 28','Aug 10','Aug 25','Sep 9','Sep 24','Oct 11','Oct 29','Nov 13','Nov 28','Dec 13'],
+                    datasets:[
+                        {label:'High',data:[120,118,125,118,120,135,145,160,175,170,155,140,125,110],backgroundColor:'#c20114',stack:'s',borderRadius:1},
+                        {label:'Medium',data:[35,40,36,32,32,40,44,47,50,53,56,59,62,65],backgroundColor:'#f69827',stack:'s',borderRadius:1},
+                        {label:'Low',data:[45,40,44,48,48,40,36,33,30,27,24,21,18,15],backgroundColor:'#f7df57',stack:'s',borderRadius:1},
+                        {label:'Score',data:[52,53,50,53,53,47,43,38,32,34,40,46,52,58],type:'line',borderColor:'#333',borderWidth:2,pointRadius:0,fill:false,yAxisID:'y1'}
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { maxRotation: 45, minRotation: 45, font: { size: 10 } }
-                        },
-                        y: {
-                            stacked: true,
-                            beginAtZero: true,
-                            max: 200,
-                            grid: { color: '#f1f5f9' }
-                        },
-                        y1: {
-                            position: 'right',
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { display: false }
-                        }
-                    }
+                options:{ responsive:true, maintainAspectRatio:false, interaction:{intersect:false,mode:'index'}, plugins:{legend:{display:false}},
+                    scales:{ x:{grid:{display:false},ticks:{maxRotation:45,minRotation:45,font:{size:10},color:'#888'}}, y:{stacked:true,beginAtZero:true,max:220,grid:{color:'#f0f0f0'},ticks:{color:'#888',font:{size:11}}}, y1:{position:'right',beginAtZero:true,max:100,grid:{display:false},ticks:{color:'#888',font:{size:11}}} }
                 }
             });
-            
-            // Initial update
-            updateSpendChart();
+            updateChart();
         }
-        
-        // Initialize on load
-        window.onload = initCharts;
+        window.onload = init;
     </script>
 </body>
 </html>
