@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Cost Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Roboto', -apple-system, sans-serif; background: #f5f7fa; font-size: 13px; }
+        
+        .container { display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 200px; background: #1e2a3b; color: #fff; display: flex; flex-direction: column; }
+        .logo { padding: 16px 20px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo-text { font-size: 18px; font-weight: 600; background: linear-gradient(90deg, #6366f1, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .filter-section { padding: 16px 20px; }
+        .filter-label { display: flex; align-items: center; gap: 8px; color: #94a3b8; margin-bottom: 8px; font-size: 12px; }
+        .filter-dropdown { background: #fff; color: #1e2a3b; padding: 8px 12px; border-radius: 4px; font-size: 13px; }
+        .nav-section { flex: 1; padding: 0 12px; }
+        .nav-title { color: #6366f1; font-size: 11px; font-weight: 600; padding: 8px; letter-spacing: 0.5px; }
+        .nav-item { padding: 8px 8px 8px 16px; color: #94a3b8; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .nav-item:hover { color: #fff; }
+        .nav-item.active { color: #fbbf24; }
+        .nav-group-title { display: flex; align-items: center; gap: 8px; padding: 8px; color: #fff; cursor: pointer; font-weight: 500; }
+        .warning-box { padding: 12px 16px; background: rgba(251, 191, 36, 0.1); margin: 8px 12px; border-radius: 4px; display: flex; align-items: flex-start; gap: 8px; }
+        .warning-box span { color: #fbbf24; font-size: 11px; line-height: 1.4; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-footer-item { color: #94a3b8; padding: 8px 0; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .version { color: #64748b; font-size: 11px; margin-top: 8px; }
+        
+        /* Main Content */
+        .main { flex: 1; display: flex; flex-direction: column; }
+        
+        /* Headers */
+        .top-header { background: #fff; padding: 12px 24px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0; gap: 24px; }
+        .top-header-title { font-weight: 600; color: #1e2a3b; }
+        .share-link { display: flex; align-items: center; gap: 8px; color: #6366f1; cursor: pointer; font-size: 13px; }
+        .search-box { background: #f1f5f9; padding: 8px 16px; border-radius: 4px; color: #64748b; display: flex; align-items: center; gap: 8px; min-width: 250px; }
+        .update-badge { background: #fef2f2; color: #dc2626; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        .header-icons { display: flex; gap: 16px; color: #64748b; }
+        
+        .sub-header { background: #fff; padding: 12px 24px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        .tab-active { background: #3b82f6; color: #fff; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
+        .tab-inactive { background: #f1f5f9; color: #64748b; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; margin-left: 4px; }
+        .header-btn { background: #3b82f6; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .header-btn-secondary { background: #fff; color: #64748b; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-left: 8px; }
+        
+        /* Dashboard Title */
+        .dashboard-title-section { padding: 16px 24px; background: #f5f7fa; }
+        .dashboard-title { display: flex; align-items: center; gap: 12px; background: #e0e7ff; padding: 8px 16px; border-radius: 20px; width: fit-content; }
+        .dashboard-title-text { font-weight: 600; color: #1e2a3b; font-size: 16px; }
+        .dashboard-badge { background: #64748b; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+        
+        /* Toggle Section */
+        .toggle-section { padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; background: #fff; margin: 0 24px 16px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .toggle-label { font-size: 14px; color: #1e2a3b; font-weight: 500; }
+        .toggle-value { font-weight: 600; }
+        .toggle-group { display: flex; background: #f1f5f9; border-radius: 8px; padding: 4px; gap: 4px; }
+        .toggle-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; background: transparent; color: #64748b; transition: all 0.2s; }
+        .toggle-btn.active { color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .toggle-btn.unblended.active { background: #fbbf24; }
+        .toggle-btn.amortized.active { background: #f97316; }
+        .toggle-btn.both.active { background: #6366f1; }
+        
+        /* Provider Cards */
+        .provider-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 24px 16px; }
+        .provider-card { background: #fff; border-radius: 8px; overflow: hidden; }
+        .provider-card.aws { border: 3px solid #fbbf24; }
+        .provider-card.azure { border: 3px solid #3b82f6; }
+        .provider-card.gcp { border: 3px solid #f97316; }
+        .provider-card.k8s { border: 3px solid #6366f1; }
+        .provider-card-header { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: center; }
+        .aws-badge { background: #1e2a3b; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .provider-card-body { padding: 16px; text-align: center; }
+        .provider-name { color: #64748b; font-size: 14px; margin-bottom: 4px; }
+        .provider-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .stat-value { font-size: 24px; font-weight: 600; color: #1e2a3b; }
+        .stat-value.amortized-color { color: #f97316; }
+        .stat-label { color: #94a3b8; font-size: 12px; }
+        .stat-dual .stat-primary { font-size: 18px; font-weight: 600; color: #fbbf24; }
+        .stat-dual .stat-secondary { font-size: 14px; font-weight: 600; color: #f97316; }
+        .stat-dual .stat-label { font-size: 11px; }
+        
+        /* Charts Section */
+        .charts-section { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; padding: 0 24px 16px; }
+        .chart-card { background: #fff; border-radius: 8px; padding: 20px; }
+        .chart-header { display: flex; align-items: center; margin-bottom: 16px; }
+        .chart-title { margin: 0; font-size: 16px; font-weight: 600; color: #1e2a3b; }
+        .chart-toggles { margin-left: auto; display: flex; gap: 8px; }
+        .chart-toggle-group { display: flex; background: #f1f5f9; border-radius: 6px; padding: 2px; }
+        .chart-toggle-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; background: transparent; color: #64748b; transition: all 0.2s; }
+        .chart-toggle-btn.active { color: #fff; }
+        .chart-toggle-btn.unblended.active { background: #fbbf24; }
+        .chart-toggle-btn.amortized.active { background: #f97316; }
+        .chart-toggle-btn.both.active { background: #6366f1; }
+        .chart-toggle-btn.time.active { background: #1e2a3b; }
+        .legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #64748b; }
+        .legend-color { width: 12px; height: 12px; border-radius: 2px; }
+        .legend-line { width: 12px; height: 3px; border-radius: 2px; }
+        .chart-container { height: 280px; position: relative; }
+        
+        /* Definitions */
+        .definitions { margin: 0 24px 24px; padding: 20px; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .definitions h4 { margin: 0 0 16px; font-size: 14px; font-weight: 600; color: #1e2a3b; }
+        .definitions-grid { display: flex; gap: 32px; flex-wrap: wrap; }
+        .definition { flex: 1; min-width: 200px; }
+        .definition h5 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .definition h5.blue { color: #3b82f6; }
+        .definition h5.purple { color: #8b5cf6; }
+        .definition h5.orange { color: #f59e0b; }
+        .definition p { color: #64748b; font-size: 12px; margin: 0; line-height: 1.5; }
+        
+        .spacer { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <span class="logo-text">hyperglance</span>
+                <span style="margin-left: auto; cursor: pointer;">≡</span>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-label"><span>▽</span><span>Filter By</span></div>
+                <div class="filter-dropdown">All Environments ▾</div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-group-title"><span>📊</span><span>Dashboards</span><span style="margin-left: auto;">▾</span></div>
+                <div class="nav-item active"><span>✦</span>Overview</div>
+                <div class="nav-item"><span>☁</span>AWS</div>
+                <div class="nav-item"><span>💰</span>Cost Overview</div>
+                <div class="nav-item"><span>☁</span>Azure</div>
+                <div class="nav-item"><span>⎈</span>Kubernetes</div>
+                <div class="nav-item"><span>☁</span>GCP</div>
+                
+                <div class="nav-title">ANALYZE</div>
+                <div class="nav-item"><span>📈</span>Cost Explorer</div>
+                <div class="nav-item"><span>📊</span>Trends & Anomalies</div>
+                
+                <div class="nav-title">OPTIMIZE</div>
+                <div class="nav-item"><span>🗑</span>Wastage</div>
+                <div class="nav-item"><span>📋</span>Commitments</div>
+                <div class="nav-item"><span>📐</span>Right Sizing</div>
+                
+                <div class="nav-title">ALLOCATE</div>
+                <div class="nav-item"><span>📄</span>Billing Report</div>
+                <div class="nav-item"><span>📊</span>Budgets</div>
+                
+                <div class="nav-title">INVENTORY</div>
+                <div class="nav-item"><span>🔗</span>Infra Diagram</div>
+                <div class="nav-item"><span>🔍</span>Search</div>
+                <div class="nav-item"><span>📏</span>Rules</div>
+            </div>
+            
+            <div class="warning-box">
+                <span>⚠</span>
+                <span>Hyperglance experienced errors while collecting cloud data.</span>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="sidebar-footer-item"><span>⚙</span>Settings</div>
+                <div class="sidebar-footer-item"><span>❓</span>Help & Support</div>
+                <div class="version">v8.1.58 | 456df39</div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main">
+            <!-- Top Header -->
+            <div class="top-header">
+                <span class="top-header-title">DASHBOARDS</span>
+                <div class="share-link"><span>🔗</span><span>Share this view</span></div>
+                <div class="spacer"></div>
+                <div class="search-box"><span>🔍</span><span>Find resource...</span></div>
+                <div class="update-badge"><span>⚠</span>Update Required</div>
+                <div class="header-icons"><span>☰</span><span>⚡</span><span>👤</span></div>
+            </div>
+            
+            <!-- Sub Header -->
+            <div class="sub-header">
+                <div class="tab-active"><span>📊</span>Dashboards</div>
+                <div class="tab-inactive"><span>📅</span>Scheduled Reports</div>
+                <div class="spacer"></div>
+                <button class="header-btn"><span>+</span>New Dashboard</button>
+                <button class="header-btn-secondary"><span>📅</span>Create Scheduled Report</button>
+                <button class="header-btn-secondary">≡</button>
+            </div>
+            
+            <!-- Dashboard Title -->
+            <div class="dashboard-title-section">
+                <div class="dashboard-title">
+                    <span style="color: #6366f1;">✦</span>
+                    <span class="dashboard-title-text">Overview</span>
+                    <span class="dashboard-badge">SYSTEM DASHBOARD</span>
+                    <span>▾</span>
+                </div>
+            </div>
+            
+            <!-- Toggle Section -->
+            <div class="toggle-section">
+                <div class="toggle-label">Cost View: <span class="toggle-value" id="toggleValueLabel">Unblended</span></div>
+                <div class="toggle-group">
+                    <button class="toggle-btn unblended active" onclick="setCostType('unblended')">Unblended</button>
+                    <button class="toggle-btn amortized" onclick="setCostType('amortized')">Amortized</button>
+                    <button class="toggle-btn both" onclick="setCostType('both')">Both</button>
+                </div>
+            </div>
+            
+            <!-- Provider Cards -->
+            <div class="provider-cards">
+                <!-- AWS -->
+                <div class="provider-card aws">
+                    <div class="provider-card-header"><div class="aws-badge">aws</div></div>
+                    <div class="provider-card-body">
+                        <div class="provider-name">Amazon Web Services</div>
+                        <div class="provider-stats">
+                            <div><div class="stat-value">6</div><div class="stat-label">Accounts</div></div>
+                            <div><div class="stat-value">10,307</div><div class="stat-label">Resources</div></div>
+                            <div id="aws-cost"><div class="stat-value">$1.12K</div><div class="stat-label">Cost (30 Days)</div></div>
+                            <div><div class="stat-value">3,004</div><div class="stat-label">Compliance Alerts</div></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Azure -->
+                <div class="provider-card azure">
+                    <div class="provider-card-header"><div style="font-size: 24px;">☁️</div></div>
+                    <div class="provider-card-body">
+                        <div class="provider-name">Microsoft Azure</div>
+                        <div class="provider-stats">
+                            <div><div class="stat-value">5</div><div class="stat-label">Subscriptions</div></div>
+                            <div><div class="stat-value">1,078</div><div class="stat-label">Resources</div></div>
+                            <div id="azure-cost"><div class="stat-value">£487.82</div><div class="stat-label">Cost (30 Days)</div></div>
+                            <div><div class="stat-value">173</div><div class="stat-label">Compliance Alerts</div></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- GCP -->
+                <div class="provider-card gcp">
+                    <div class="provider-card-header"><div style="font-size: 24px;">🔴🟡🟢🔵</div></div>
+                    <div class="provider-card-body">
+                        <div class="provider-name">Google Cloud Platform</div>
+                        <div class="provider-stats">
+                            <div><div class="stat-value">1</div><div class="stat-label">Projects</div></div>
+                            <div><div class="stat-value">190</div><div class="stat-label">Resources</div></div>
+                            <div id="gcp-cost"><div class="stat-value">£91.38</div><div class="stat-label">Cost (30 Days)</div></div>
+                            <div><div class="stat-value">0</div><div class="stat-label">Compliance Alerts</div></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Kubernetes -->
+                <div class="provider-card k8s">
+                    <div class="provider-card-header"><div style="font-size: 24px;">⎈</div></div>
+                    <div class="provider-card-body">
+                        <div class="provider-name">Kubernetes</div>
+                        <div class="provider-stats">
+                            <div><div class="stat-value">2</div><div class="stat-label">Clusters</div></div>
+                            <div><div class="stat-value">146</div><div class="stat-label">Resources</div></div>
+                            <div><div class="stat-value"></div><div class="stat-label"></div></div>
+                            <div><div class="stat-value">0</div><div class="stat-label">Compliance Alerts</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <!-- Cloud Provider Spend -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Cloud Provider Spend</h3>
+                        <div class="chart-toggles">
+                            <div class="chart-toggle-group" style="margin-right: 8px;">
+                                <button class="chart-toggle-btn unblended active" onclick="setCostType('unblended')">Unblended</button>
+                                <button class="chart-toggle-btn amortized" onclick="setCostType('amortized')">Amortized</button>
+                                <button class="chart-toggle-btn both" onclick="setCostType('both')">Both</button>
+                            </div>
+                            <div class="chart-toggle-group">
+                                <button class="chart-toggle-btn time" onclick="setTimeRange('Day')">Day</button>
+                                <button class="chart-toggle-btn time" onclick="setTimeRange('Week')">Week</button>
+                                <button class="chart-toggle-btn time active" onclick="setTimeRange('Month')">Month</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="legend" id="spend-legend">
+                        <div class="legend-item"><div class="legend-color" style="background: #fbbf24;"></div>Amazon</div>
+                        <div class="legend-item"><div class="legend-line" style="background: #fbbf24;"></div>Amazon trendline</div>
+                        <div class="legend-item"><div class="legend-color" style="background: #22c55e;"></div>GCP</div>
+                        <div class="legend-item"><div class="legend-line" style="background: #22c55e;"></div>GCP trendline</div>
+                        <div class="legend-item"><div class="legend-color" style="background: #3b82f6;"></div>Azure</div>
+                        <div class="legend-item"><div class="legend-line" style="background: #3b82f6;"></div>Azure trendline</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="spendChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Compliance History -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Compliance History</h3>
+                    </div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-color" style="background: #fef08a;"></div>Low Priority</div>
+                        <div class="legend-item"><div class="legend-color" style="background: #fb923c;"></div>Medium Priority</div>
+                        <div class="legend-item"><div class="legend-color" style="background: #ef4444;"></div>High Priority</div>
+                        <div class="legend-item"><div class="legend-line" style="background: #1e2a3b;"></div>Compliance Score</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="complianceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Definitions -->
+            <div class="definitions">
+                <h4>Cost Type Definitions</h4>
+                <div class="definitions-grid">
+                    <div class="definition">
+                        <h5 class="blue">Unblended Cost</h5>
+                        <p>Actual charges incurred at the time of usage. Shows raw pay-as-you-go costs without any adjustments for reserved capacity or savings plans.</p>
+                    </div>
+                    <div class="definition">
+                        <h5 class="purple">Amortized Cost</h5>
+                        <p>Spreads upfront costs (Reserved Instances, Savings Plans) over the billing period. Better reflects the true cost of resources over time.</p>
+                    </div>
+                    <div class="definition">
+                        <h5 class="orange">Both View</h5>
+                        <p>Displays both cost types side by side for comparison. Helps identify the impact of amortization on your cloud spending patterns.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Data
+        const months = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const amazonData = [80, 120, 150, 200, 250, 320, 380, 450, 520, 600, 680, 780, 900];
+        const gcpData = [20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110, 75, 85];
+        const azureData = [30, 40, 50, 60, 75, 90, 105, 120, 140, 160, 180, 200, 220];
+        const amazonTrend = [90, 130, 170, 220, 280, 350, 420, 500, 580, 660, 750, 850, 950];
+        const gcpTrend = [25, 30, 38, 48, 60, 75, 88, 100, 115, 130, 145, 160, 175];
+        const azureTrend = [35, 45, 58, 72, 90, 108, 126, 144, 168, 192, 216, 240, 264];
+        
+        const complianceDates = ['Jun 15', 'Jun 25', 'Jul 5', 'Jul 15', 'Jul 28', 'Aug 10', 'Aug 25', 'Sep 9', 'Sep 24', 'Oct 11', 'Oct 29', 'Nov 13', 'Nov 28', 'Dec 13'];
+        const highPriority = [120, 118, 125, 118, 120, 135, 145, 160, 175, 170, 155, 140, 125, 110];
+        const mediumPriority = [35, 40, 36, 32, 32, 40, 44, 47, 50, 53, 56, 59, 62, 65];
+        const lowPriority = [45, 40, 44, 48, 48, 40, 36, 33, 30, 27, 24, 21, 18, 15];
+        const complianceScore = [52, 53, 50, 53, 53, 47, 43, 38, 32, 34, 40, 46, 52, 58];
+        
+        // Provider costs
+        const providerCosts = {
+            aws: { unblended: 1120, amortized: 1254 },
+            azure: { unblended: 487.82, amortized: 526.85 },
+            gcp: { unblended: 91.38, amortized: 95.95 }
+        };
+        
+        let currentCostType = 'unblended';
+        let currentTimeRange = 'Month';
+        let spendChart, complianceChart;
+        
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        function formatCost(value, currency = '$') {
+            if (value >= 1000) return currency + formatNumber((value / 1000).toFixed(2)) + 'K';
+            return currency + formatNumber(value.toFixed(2));
+        }
+        
+        function setCostType(type) {
+            currentCostType = type;
+            updateUI();
+        }
+        
+        function setTimeRange(range) {
+            currentTimeRange = range;
+            // Update time toggle buttons
+            document.querySelectorAll('.chart-toggle-btn.time').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === range) btn.classList.add('active');
+            });
+        }
+        
+        function updateUI() {
+            // Update toggle buttons
+            document.querySelectorAll('.toggle-btn, .chart-toggle-btn').forEach(btn => {
+                if (btn.classList.contains('unblended') || btn.classList.contains('amortized') || btn.classList.contains('both')) {
+                    btn.classList.remove('active');
+                    if (btn.classList.contains(currentCostType)) btn.classList.add('active');
+                }
+            });
+            
+            // Update label
+            const label = document.getElementById('toggleValueLabel');
+            label.textContent = currentCostType === 'both' ? 'Comparing Both' : currentCostType.charAt(0).toUpperCase() + currentCostType.slice(1);
+            label.style.color = currentCostType === 'unblended' ? '#fbbf24' : currentCostType === 'amortized' ? '#f97316' : '#6366f1';
+            
+            // Update provider costs
+            updateProviderCosts();
+            
+            // Update chart
+            updateSpendChart();
+            
+            // Update legend
+            updateLegend();
+        }
+        
+        function updateProviderCosts() {
+            const providers = ['aws', 'azure', 'gcp'];
+            const currencies = { aws: '$', azure: '£', gcp: '£' };
+            
+            providers.forEach(provider => {
+                const el = document.getElementById(provider + '-cost');
+                const costs = providerCosts[provider];
+                const currency = currencies[provider];
+                
+                if (currentCostType === 'both') {
+                    el.innerHTML = `
+                        <div class="stat-dual">
+                            <div class="stat-primary">${formatCost(costs.unblended, currency)}</div>
+                            <div class="stat-secondary">${formatCost(costs.amortized, currency)}</div>
+                            <div class="stat-label">Unbl. / Amort.</div>
+                        </div>
+                    `;
+                } else {
+                    const value = currentCostType === 'amortized' ? costs.amortized : costs.unblended;
+                    const colorClass = currentCostType === 'amortized' ? ' amortized-color' : '';
+                    el.innerHTML = `
+                        <div class="stat-value${colorClass}">${formatCost(value, currency)}</div>
+                        <div class="stat-label">Cost (30 Days)</div>
+                    `;
+                }
+            });
+        }
+        
+        function updateLegend() {
+            const legend = document.getElementById('spend-legend');
+            if (currentCostType === 'both') {
+                legend.innerHTML = `
+                    <div class="legend-item"><div class="legend-color" style="background: #fbbf24;"></div>Amazon (Unblended)</div>
+                    <div class="legend-item"><div class="legend-line" style="background: #fbbf24;"></div>Unblended trendline</div>
+                    <div class="legend-item"><div class="legend-color" style="background: #f97316;"></div>Amazon (Amortized)</div>
+                    <div class="legend-item"><div class="legend-line" style="background: #f97316;"></div>Amortized trendline</div>
+                    <div class="legend-item"><div class="legend-color" style="background: #22c55e;"></div>GCP</div>
+                    <div class="legend-item"><div class="legend-line" style="background: #22c55e;"></div>GCP trendline</div>
+                    <div class="legend-item"><div class="legend-color" style="background: #3b82f6;"></div>Azure</div>
+                    <div class="legend-item"><div class="legend-line" style="background: #3b82f6;"></div>Azure trendline</div>
+                `;
+            } else {
+                legend.innerHTML = `
+                    <div class="legend-item"><div class="legend-color" style="background: #fbbf24;"></div>Amazon</div>
+                    <div class="legend-item"><div class="legend-line" style="background: #fbbf24;"></div>Amazon trendline</div>
+                    <div class="legend-item"><div class="legend-color" style="background: #22c55e;"></div>GCP</div>
+                    <div class="legend-item"><div class="legend-line" style="background: #22c55e;"></div>GCP trendline</div>
+                    <div class="legend-item"><div class="legend-color" style="background: #3b82f6;"></div>Azure</div>
+                    <div class="legend-item"><div class="legend-line" style="background: #3b82f6;"></div>Azure trendline</div>
+                `;
+            }
+        }
+        
+        function updateSpendChart() {
+            const multiplier = currentCostType === 'amortized' ? 1.12 : 1;
+            const amazonValues = amazonData.map(v => v * multiplier);
+            const amazonTrendValues = amazonTrend.map(v => v * multiplier);
+            
+            const datasets = [];
+            
+            if (currentCostType === 'both') {
+                datasets.push({
+                    label: 'Amazon (Unblended)',
+                    data: amazonData,
+                    backgroundColor: '#fbbf24',
+                    borderRadius: 2,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.7,
+                    order: 3
+                });
+                datasets.push({
+                    label: 'Amazon (Amortized)',
+                    data: amazonData.map(v => v * 1.12),
+                    backgroundColor: '#f97316',
+                    borderRadius: 2,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.7,
+                    order: 3
+                });
+            } else {
+                datasets.push({
+                    label: 'Amazon',
+                    data: amazonValues,
+                    backgroundColor: '#fbbf24',
+                    borderRadius: 2,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.8,
+                    order: 3
+                });
+            }
+            
+            datasets.push({
+                label: 'GCP',
+                data: gcpData,
+                backgroundColor: '#22c55e',
+                borderRadius: 2,
+                barPercentage: 0.6,
+                categoryPercentage: 0.8,
+                order: 3
+            });
+            
+            datasets.push({
+                label: 'Azure',
+                data: azureData,
+                backgroundColor: '#3b82f6',
+                borderRadius: 2,
+                barPercentage: 0.6,
+                categoryPercentage: 0.8,
+                yAxisID: 'y1',
+                order: 3
+            });
+            
+            // Trendlines
+            if (currentCostType === 'both') {
+                datasets.push({
+                    label: 'Unblended Trend',
+                    data: amazonTrend,
+                    type: 'line',
+                    borderColor: '#fbbf24',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false,
+                    order: 1
+                });
+                datasets.push({
+                    label: 'Amortized Trend',
+                    data: amazonTrend.map(v => v * 1.12),
+                    type: 'line',
+                    borderColor: '#f97316',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false,
+                    order: 1
+                });
+            } else {
+                datasets.push({
+                    label: 'Amazon Trend',
+                    data: amazonTrendValues,
+                    type: 'line',
+                    borderColor: '#fbbf24',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false,
+                    order: 1
+                });
+            }
+            
+            datasets.push({
+                label: 'GCP Trend',
+                data: gcpTrend,
+                type: 'line',
+                borderColor: '#22c55e',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                fill: false,
+                order: 1
+            });
+            
+            datasets.push({
+                label: 'Azure Trend',
+                data: azureTrend,
+                type: 'line',
+                borderColor: '#3b82f6',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                fill: false,
+                yAxisID: 'y1',
+                order: 1
+            });
+            
+            spendChart.data.datasets = datasets;
+            spendChart.update();
+        }
+        
+        // Initialize charts
+        function initCharts() {
+            // Spend Chart
+            const spendCtx = document.getElementById('spendChart').getContext('2d');
+            spendChart = new Chart(spendCtx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': $' + formatNumber(Math.round(context.raw));
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            beginAtZero: true,
+                            max: 1400,
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                callback: function(value) { return '$' + formatNumber(value); }
+                            }
+                        },
+                        y1: {
+                            position: 'right',
+                            beginAtZero: true,
+                            max: 400,
+                            grid: { display: false },
+                            ticks: {
+                                callback: function(value) { return '£' + formatNumber(value); }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Compliance Chart
+            const complianceCtx = document.getElementById('complianceChart').getContext('2d');
+            complianceChart = new Chart(complianceCtx, {
+                type: 'bar',
+                data: {
+                    labels: complianceDates,
+                    datasets: [
+                        {
+                            label: 'High Priority',
+                            data: highPriority,
+                            backgroundColor: '#ef4444',
+                            stack: 'stack1'
+                        },
+                        {
+                            label: 'Medium Priority',
+                            data: mediumPriority,
+                            backgroundColor: '#fb923c',
+                            stack: 'stack1'
+                        },
+                        {
+                            label: 'Low Priority',
+                            data: lowPriority,
+                            backgroundColor: '#fef08a',
+                            stack: 'stack1'
+                        },
+                        {
+                            label: 'Compliance Score',
+                            data: complianceScore,
+                            type: 'line',
+                            borderColor: '#1e2a3b',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { maxRotation: 45, minRotation: 45, font: { size: 10 } }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            max: 200,
+                            grid: { color: '#f1f5f9' }
+                        },
+                        y1: {
+                            position: 'right',
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            // Initial update
+            updateSpendChart();
+        }
+        
+        // Initialize on load
+        window.onload = initCharts;
+    </script>
+</body>
+</html>
